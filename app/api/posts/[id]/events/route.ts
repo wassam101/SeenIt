@@ -33,7 +33,13 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  await supabase.from('event_members').insert({ event_id: data.id, user_id: user.id })
+  const { error: memberError } = await supabase
+    .from('event_members')
+    .insert({ event_id: data.id, user_id: user.id })
+
+  if (memberError) {
+    return NextResponse.json({ error: memberError.message }, { status: 500 })
+  }
 
   return NextResponse.json({ id: data.id, organizerId: data.organizer_id }, { status: 201 })
 }
