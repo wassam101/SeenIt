@@ -1,4 +1,10 @@
 // app/post/[id]/page.tsx
+import { LikeButton } from '@/components/LikeButton'
+import { CommentThread } from '@/components/CommentThread'
+import { RepostButton } from '@/components/RepostButton'
+import { ReportButton } from '@/components/ReportButton'
+import { PostEventLauncher } from '@/components/PostEventLauncher'
+
 async function getPost(id: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/api/posts/${id}`, { cache: 'no-store' })
   if (!res.ok) return null
@@ -27,9 +33,11 @@ export default async function PostPage({ params }: { params: { id: string } }) {
       <p>
         By {post.authorName} {post.locationLabel ? `· ${post.locationLabel}` : ''}
       </p>
-      <p>
-        {post.likeCount} likes · {post.commentCount} comments
-      </p>
+      <LikeButton postId={post.id} initiallyLiked={false} />
+      <RepostButton postId={post.id} />
+      <ReportButton targetType="post" targetId={post.id} />
+      <PostEventLauncher postId={post.id} />
+      <CommentThread postId={post.id} />
     </article>
   )
 }

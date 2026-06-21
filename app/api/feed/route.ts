@@ -12,7 +12,7 @@ export async function GET(request: Request) {
 
   let query = supabase
     .from('posts')
-    .select('id, caption, thumbnail_url, created_at, profiles(display_name)')
+    .select('id, caption, thumbnail_url, created_at, profiles!posts_author_id_fkey(display_name)')
     .eq('status', 'ready')
     .is('deleted_at', null)
 

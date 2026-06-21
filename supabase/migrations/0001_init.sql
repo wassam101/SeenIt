@@ -119,3 +119,12 @@ create policy "users insert own reports" on reports for insert with check (auth.
 
 create policy "members are publicly readable" on event_members for select using (true);
 create policy "users join events as self" on event_members for insert with check (auth.uid() = user_id);
+
+-- Grant table-level privileges to the standard Supabase API roles. Row Level
+-- Security policies above still govern which rows are visible/mutable; these
+-- grants only allow the roles to attempt the operation at all.
+grant usage on schema public to anon, authenticated, service_role;
+grant select, insert, update, delete on all tables in schema public to anon, authenticated, service_role;
+grant usage, select on all sequences in schema public to anon, authenticated, service_role;
+alter default privileges in schema public grant select, insert, update, delete on tables to anon, authenticated, service_role;
+alter default privileges in schema public grant usage, select on sequences to anon, authenticated, service_role;

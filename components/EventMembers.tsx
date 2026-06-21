@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
 
 type Member = { userId: string; displayName: string; joinedAt: string }
 
@@ -8,7 +9,21 @@ export function EventMembers({ eventId }: { eventId: string }) {
   const [joined, setJoined] = useState(false)
 
   useEffect(() => {
-    fetch(`/api/events/${eventId}/members`).then((res) => res.json()).then((data) => setMembers(data.members))
+    // Use createBrowserClient directly (rather than the shared getEnv() helper)
+    // since only NEXT_PUBLIC_* vars are available in the browser bundle.
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+    Promise.all([
+      fetch(`/api/events/${eventId}/members`).then((res) => res.json()),
+      supabase.auth.getUser(),
+    ]).then(([data, { data: userData }]) => {
+      setMembers(data.members)
+      if (userData.user && data.members.some((m: Member) => m.userId === userData.user!.id)) {
+        setJoined(true)
+      }
+    })
   }, [eventId])
 
   async function join() {
