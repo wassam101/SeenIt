@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-const REASONS = ['Misinformation', 'Harassment', 'Spam', 'Other']
+const REASONS = ['Misinformation', 'Spam', 'Other']
 
 export function ReportButton({ targetType, targetId }: { targetType: 'post' | 'comment'; targetId: string }) {
   const [open, setOpen] = useState(false)
@@ -15,16 +15,28 @@ export function ReportButton({ targetType, targetId }: { targetType: 'post' | 'c
     }
   }
 
-  if (submitted) return <p>Reported. Thank you.</p>
+  if (submitted) {
+    return <p className="font-mono text-xs uppercase tracking-wider text-slate px-3 py-1.5">Reported. Thank you.</p>
+  }
 
   return (
-    <div>
-      <button onClick={() => setOpen((v) => !v)}>Report</button>
+    <div className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="font-mono text-xs uppercase tracking-wider px-3 py-1.5 border border-evidence text-slate hover:border-ink hover:text-ink transition-colors"
+      >
+        ⚑ Report
+      </button>
       {open && (
-        <ul>
+        <ul className="absolute left-0 top-full mt-1 z-10 bg-white border border-ink min-w-36 shadow-sm">
           {REASONS.map((reason) => (
             <li key={reason}>
-              <button onClick={() => submit(reason)}>{reason}</button>
+              <button
+                onClick={() => submit(reason)}
+                className="w-full text-left font-mono text-xs px-3 py-2 hover:bg-paper transition-colors"
+              >
+                {reason}
+              </button>
             </li>
           ))}
         </ul>

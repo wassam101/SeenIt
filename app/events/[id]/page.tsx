@@ -11,8 +11,12 @@ async function getEvent(id: string) {
 export default async function EventPage({ params }: { params: { id: string } }) {
   const event = await getEvent(params.id)
   return (
-    <article>
-      <EventMembers eventId={event.id} />
+    <article className="mx-auto max-w-2xl px-4 py-6">
+      <p className="font-mono text-[11px] uppercase tracking-wider text-slate mb-1">Organizing around a report</p>
+      <h1 className="font-display font-bold text-xl mb-4">Event</h1>
+      <div className="mb-6">
+        <EventMembers eventId={event.id} />
+      </div>
       <CommentThread eventId={event.id} />
     </article>
   )

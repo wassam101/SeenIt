@@ -7,7 +7,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
   const { data, error } = await supabase
     .from('posts')
     .select(
-      'id, author_id, video_id, thumbnail_url, caption, lat, lng, location_label, status, created_at, profiles!posts_author_id_fkey(display_name), likes(count), comments(count)'
+      'id, author_id, media_type, video_id, image_url, thumbnail_url, caption, lat, lng, location_label, status, created_at, profiles!posts_author_id_fkey(display_name), likes(count), comments(count)'
     )
     .eq('id', params.id)
     .is('deleted_at', null)
@@ -21,7 +21,9 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     id: data.id,
     authorId: data.author_id,
     authorName: (data as any).profiles?.display_name ?? 'Unknown',
+    mediaType: (data as any).media_type ?? 'video',
     videoId: data.video_id,
+    imageUrl: (data as any).image_url,
     thumbnailUrl: data.thumbnail_url,
     caption: data.caption,
     lat: data.lat,

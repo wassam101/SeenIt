@@ -1,26 +1,99 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-paper: #ffffff;
+  --color-ink: #1c2421;
+  --color-signal: #e4342e;
+  --color-caution: #ebde99;
+  --color-slate: #6b7570;
+  --color-evidence: #e7e2c9;
+  --color-teal: #3a867a;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-paper: var(--color-paper);
+  --color-ink: var(--color-ink);
+  --color-signal: var(--color-signal);
+  --color-caution: var(--color-caution);
+  --color-slate: var(--color-slate);
+  --color-evidence: var(--color-evidence);
+  --color-teal: var(--color-teal);
+  --font-display: var(--font-display);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-plex-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-caution);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 2px;
+}
+
+/* Ambient logo blink — reads as the brand "watching" */
+@keyframes logo-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.08); }
+}
+
+.logo-blink {
+  transform-origin: center;
+  animation: logo-blink 6s ease-in-out infinite;
+}
+
+/* One-shot blink played when the SeenIt eye toggles open */
+@keyframes eye-blink-once {
+  0% { transform: scaleY(1); }
+  35% { transform: scaleY(0.08); }
+  70% { transform: scaleY(1.15); }
+  100% { transform: scaleY(1); }
+}
+
+.eye-blink-once {
+  transform-origin: center;
+  animation: eye-blink-once 360ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-blink,
+  .eye-blink-once {
+    animation: none;
+  }
+}
+
+/* Viewfinder corner brackets — the "captured footage" frame for post media */
+.viewfinder {
+  position: relative;
+}
+
+.viewfinder::before,
+.viewfinder::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  z-index: 1;
+}
+
+.viewfinder::before {
+  top: 8px;
+  left: 8px;
+  border-top: 2px solid var(--color-caution);
+  border-left: 2px solid var(--color-caution);
+}
+
+.viewfinder::after {
+  bottom: 8px;
+  right: 8px;
+  border-bottom: 2px solid var(--color-caution);
+  border-right: 2px solid var(--color-caution);
 }

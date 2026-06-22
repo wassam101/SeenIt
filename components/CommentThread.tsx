@@ -25,16 +25,31 @@ export function CommentThread({ postId, eventId }: { postId?: string; eventId?: 
 
   return (
     <section>
-      <ul>
+      <p className="font-mono text-[11px] uppercase tracking-wider text-slate mb-2">
+        {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
+      </p>
+      <ul className="flex flex-col gap-2 mb-3">
         {comments.map((c) => (
-          <li key={c.id}>
-            <strong>{c.authorName}:</strong> {c.body}
+          <li key={c.id} className="text-sm leading-snug">
+            <strong className="font-semibold">{c.authorName}</strong>{' '}
+            <span className="text-ink/90">{c.body}</span>
           </li>
         ))}
       </ul>
-      <form onSubmit={submit}>
-        <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Add a comment" required />
-        <button type="submit">Post</button>
+      <form onSubmit={submit} className="flex gap-2">
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="Add a comment"
+          required
+          className="flex-1 border border-evidence px-3 py-1.5 text-sm bg-white focus-visible:border-ink"
+        />
+        <button
+          type="submit"
+          className="font-mono text-xs uppercase tracking-wider px-3 py-1.5 bg-ink text-paper hover:bg-signal transition-colors"
+        >
+          Post
+        </button>
       </form>
     </section>
   )
