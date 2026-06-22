@@ -14,10 +14,8 @@ export function ShareButton({ postId }: { postId: string }) {
     <button
       onClick={share}
       disabled={shared}
-      className={`flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider px-3 py-1.5 border transition-colors disabled:cursor-default ${
-        shared
-          ? 'bg-ink text-paper border-ink'
-          : 'border-evidence text-slate hover:border-ink hover:text-ink'
+      className={`flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider px-3 py-1.5 transition-colors disabled:cursor-default ${
+        shared ? 'text-signal' : 'text-teal hover:text-signal'
       }`}
     >
       <ShareIcon className="h-3.5 w-3.5" />

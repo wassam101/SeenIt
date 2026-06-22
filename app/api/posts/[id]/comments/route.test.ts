@@ -13,7 +13,7 @@ vi.mock('@/lib/supabase/server', () => ({
         eq: () => ({
           is: () => ({
             order: async () => ({
-              data: [{ id: 'c1', body: 'nice', created_at: '2026-01-01T00:00:00Z', profiles: { display_name: 'Alice' } }],
+              data: [{ id: 'c1', author_id: 'u-alice', body: 'nice', created_at: '2026-01-01T00:00:00Z', profiles: { display_name: 'Alice' } }],
               error: null,
             }),
           }),
@@ -35,7 +35,9 @@ describe('comments routes', () => {
   it('GET lists comments for a post', async () => {
     const res = await GET(new Request('http://localhost/api/posts/post-1/comments'), { params: { id: 'post-1' } })
     const json = await res.json()
-    expect(json.comments).toEqual([{ id: 'c1', authorName: 'Alice', body: 'nice', createdAt: '2026-01-01T00:00:00Z' }])
+    expect(json.comments).toEqual([
+      { id: 'c1', authorId: 'u-alice', authorName: 'Alice', authorAvatarUrl: null, body: 'nice', createdAt: '2026-01-01T00:00:00Z' },
+    ])
   })
 
   it('POST requires a non-empty body', async () => {

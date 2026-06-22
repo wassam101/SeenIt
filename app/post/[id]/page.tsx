@@ -5,7 +5,9 @@ import { ShareButton } from '@/components/ShareButton'
 import { ReportButton } from '@/components/ReportButton'
 import { PostEventLauncher } from '@/components/PostEventLauncher'
 import { EyeIcon } from '@/components/icons/Eye'
+import { Avatar } from '@/components/Avatar'
 import { formatRelativeTime } from '@/lib/time'
+import Link from 'next/link'
 
 async function getPost(id: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/api/posts/${id}`, { cache: 'no-store' })
@@ -26,7 +28,7 @@ export default async function PostPage({ params }: { params: { id: string } }) {
 
   return (
     <article className="mx-auto max-w-2xl">
-      <div className="viewfinder aspect-video bg-ink flex items-center justify-center">
+      <div className="aspect-video bg-ink flex items-center justify-center">
         {post.mediaType === 'image' && post.imageUrl ? (
           <img src={post.imageUrl} alt={post.caption ?? ''} className="w-full h-full object-cover" />
         ) : post.status === 'ready' ? (
@@ -55,7 +57,17 @@ export default async function PostPage({ params }: { params: { id: string } }) {
         </div>
 
         <p className="font-display font-bold text-xl mt-2 leading-snug">{post.caption}</p>
-        <p className="font-mono text-xs text-slate mt-1">By {post.authorName}</p>
+        {post.authorId ? (
+          <Link href={`/u/${post.authorId}`} className="flex items-center gap-2 mt-1.5 hover:text-teal w-fit">
+            <Avatar name={post.authorName} avatarUrl={post.authorAvatarUrl} size={22} />
+            <p className="font-mono text-xs text-slate">{post.authorName}</p>
+          </Link>
+        ) : (
+          <div className="flex items-center gap-2 mt-1.5">
+            <Avatar name={post.authorName} avatarUrl={post.authorAvatarUrl} size={22} />
+            <p className="font-mono text-xs text-slate">{post.authorName}</p>
+          </div>
+        )}
 
         <div className="flex items-center gap-2 mt-4 pb-4 border-b border-evidence">
           <SeenItButton postId={post.id} initiallySeen={false} />

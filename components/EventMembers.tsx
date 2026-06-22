@@ -1,8 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import Link from 'next/link'
+import { Avatar } from '@/components/Avatar'
 
-type Member = { userId: string; displayName: string; joinedAt: string }
+type Member = { userId: string; displayName: string; avatarUrl?: string | null; joinedAt: string }
 
 export function EventMembers({ eventId }: { eventId: string }) {
   const [members, setMembers] = useState<Member[]>([])
@@ -45,9 +47,14 @@ export function EventMembers({ eventId }: { eventId: string }) {
       >
         {joined ? '✓ Joined' : 'Join event'}
       </button>
-      <ul className="flex flex-col gap-1 mt-3 text-sm">
+      <ul className="flex flex-col gap-2 mt-3 text-sm">
         {members.map((m) => (
-          <li key={m.userId}>{m.displayName}</li>
+          <li key={m.userId}>
+            <Link href={`/u/${m.userId}`} className="flex items-center gap-2 hover:text-teal w-fit">
+              <Avatar name={m.displayName} avatarUrl={m.avatarUrl} size={20} />
+              {m.displayName}
+            </Link>
+          </li>
         ))}
       </ul>
     </section>

@@ -69,7 +69,7 @@ export function StartEventForm({ postId, onCreated }: { postId: string; onCreate
 
       <button
         type="submit"
-        className="font-mono text-xs uppercase tracking-wider px-4 py-2 bg-signal text-paper hover:bg-ink transition-colors"
+        className="font-mono text-xs uppercase tracking-wider px-4 py-2 bg-teal text-paper hover:bg-signal active:bg-signal transition-colors"
       >
         Start event
       </button>

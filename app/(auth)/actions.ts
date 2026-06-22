@@ -39,3 +39,8 @@ export async function signIn(formData: FormData): Promise<{ error?: string }> {
   }
   return {}
 }
+
+export async function signOut(): Promise<void> {
+  const supabase = createServerSupabase()
+  await supabase.auth.signOut()
+}

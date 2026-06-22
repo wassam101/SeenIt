@@ -1,11 +1,23 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const REASONS = ['Misinformation', 'Spam', 'Other']
 
 export function ReportButton({ targetType, targetId }: { targetType: 'post' | 'comment'; targetId: string }) {
   const [open, setOpen] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [open])
 
   async function submit(reason: string) {
     const res = await fetch('/api/reports', { method: 'POST', body: JSON.stringify({ targetType, targetId, reason }) })
@@ -20,10 +32,12 @@ export function ReportButton({ targetType, targetId }: { targetType: 'post' | 'c
   }
 
   return (
-    <div className="relative">
+    <div ref={containerRef} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="font-mono text-xs uppercase tracking-wider px-3 py-1.5 border border-evidence text-slate hover:border-ink hover:text-ink transition-colors"
+        className={`flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider px-3 py-1.5 transition-colors ${
+          open ? 'text-signal' : 'text-teal hover:text-signal'
+        }`}
       >
         ⚑ Report
       </button>

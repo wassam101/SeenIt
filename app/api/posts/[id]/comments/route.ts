@@ -2,12 +2,13 @@
 import { NextResponse } from 'next/server'
 import { requireUser } from '@/lib/auth/require-user'
 import { createServerSupabase } from '@/lib/supabase/server'
+import { publicDisplayName, publicAvatarUrl } from '@/lib/profile/public-name'
 
 export async function GET(_request: Request, { params }: { params: { id: string } }) {
   const supabase = createServerSupabase()
   const { data, error } = await supabase
     .from('comments')
-    .select('id, body, created_at, profiles(display_name)')
+    .select('id, body, created_at, author_id, profiles(display_name, avatar_url, is_anonymous)')
     .eq('post_id', params.id)
     .is('deleted_at', null)
     .order('created_at', { ascending: true })
@@ -16,7 +17,9 @@ export async function GET(_request: Request, { params }: { params: { id: string 
 
   const comments = (data ?? []).map((row: any) => ({
     id: row.id,
-    authorName: row.profiles?.display_name ?? 'Unknown',
+    authorId: row.profiles?.is_anonymous ? null : row.author_id,
+    authorName: publicDisplayName(row.profiles),
+    authorAvatarUrl: publicAvatarUrl(row.profiles),
     body: row.body,
     createdAt: row.created_at,
   }))

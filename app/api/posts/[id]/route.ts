@@ -1,13 +1,14 @@
 // app/api/posts/[id]/route.ts
 import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
+import { publicDisplayName, publicAvatarUrl } from '@/lib/profile/public-name'
 
 export async function GET(_request: Request, { params }: { params: { id: string } }) {
   const supabase = createServerSupabase()
   const { data, error } = await supabase
     .from('posts')
     .select(
-      'id, author_id, media_type, video_id, image_url, thumbnail_url, caption, lat, lng, location_label, status, created_at, profiles!posts_author_id_fkey(display_name), likes(count), comments(count)'
+      'id, author_id, media_type, video_id, image_url, thumbnail_url, caption, lat, lng, location_label, status, created_at, profiles!posts_author_id_fkey(display_name, avatar_url, is_anonymous), likes(count), comments(count)'
     )
     .eq('id', params.id)
     .is('deleted_at', null)
@@ -19,8 +20,9 @@ export async function GET(_request: Request, { params }: { params: { id: string 
 
   return NextResponse.json({
     id: data.id,
-    authorId: data.author_id,
-    authorName: (data as any).profiles?.display_name ?? 'Unknown',
+    authorId: (data as any).profiles?.is_anonymous ? null : data.author_id,
+    authorName: publicDisplayName((data as any).profiles),
+    authorAvatarUrl: publicAvatarUrl((data as any).profiles),
     mediaType: (data as any).media_type ?? 'video',
     videoId: data.video_id,
     imageUrl: (data as any).image_url,

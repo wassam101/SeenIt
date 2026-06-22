@@ -1,6 +1,7 @@
 // app/api/feed/route.ts
 import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
+import { publicDisplayName, publicAvatarUrl } from '@/lib/profile/public-name'
 
 const PAGE_SIZE = 20
 const KM_PER_DEGREE_LAT = 111
@@ -12,7 +13,7 @@ export async function GET(request: Request) {
 
   let query = supabase
     .from('posts')
-    .select('id, caption, thumbnail_url, created_at, profiles!posts_author_id_fkey(display_name)')
+    .select('id, author_id, caption, thumbnail_url, created_at, profiles!posts_author_id_fkey(display_name, avatar_url, is_anonymous)')
     .eq('status', 'ready')
     .is('deleted_at', null)
 
@@ -42,7 +43,9 @@ export async function GET(request: Request) {
 
   const posts = (data ?? []).map((row: any) => ({
     id: row.id,
-    authorName: row.profiles?.display_name ?? 'Unknown',
+    authorId: row.profiles?.is_anonymous ? null : row.author_id,
+    authorName: publicDisplayName(row.profiles),
+    authorAvatarUrl: publicAvatarUrl(row.profiles),
     thumbnailUrl: row.thumbnail_url,
     caption: row.caption,
     createdAt: row.created_at,

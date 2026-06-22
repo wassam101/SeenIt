@@ -21,10 +21,8 @@ export function SeenItButton({ postId, initiallySeen }: { postId: string; initia
     <button
       onClick={toggle}
       aria-pressed={seen}
-      className={`flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider px-3 py-1.5 border transition-colors ${
-        seen
-          ? 'bg-signal text-paper border-signal'
-          : 'border-evidence text-slate hover:border-signal hover:text-signal'
+      className={`flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider px-3 py-1.5 transition-colors ${
+        seen ? 'text-signal' : 'text-teal hover:text-signal'
       }`}
     >
       <EyeIcon open={seen} className={`h-3.5 w-6 ${justBlinked ? 'eye-blink-once' : ''}`} />

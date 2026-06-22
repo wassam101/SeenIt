@@ -13,7 +13,7 @@ vi.mock('@/lib/supabase/server', () => ({
         eq: () => ({
           is: () => ({
             order: async () => ({
-              data: [{ id: 'c1', body: 'count me in', created_at: '2026-01-01T00:00:00Z', profiles: { display_name: 'Alice' } }],
+              data: [{ id: 'c1', author_id: 'u-alice', body: 'count me in', created_at: '2026-01-01T00:00:00Z', profiles: { display_name: 'Alice' } }],
               error: null,
             }),
           }),
@@ -32,7 +32,9 @@ describe('event comments routes', () => {
   it('GET lists comments for an event', async () => {
     const res = await GET(new Request('http://localhost/api/events/event-1/comments'), { params: { id: 'event-1' } })
     const json = await res.json()
-    expect(json.comments).toEqual([{ id: 'c1', authorName: 'Alice', body: 'count me in', createdAt: '2026-01-01T00:00:00Z' }])
+    expect(json.comments).toEqual([
+      { id: 'c1', authorId: 'u-alice', authorName: 'Alice', authorAvatarUrl: null, body: 'count me in', createdAt: '2026-01-01T00:00:00Z' },
+    ])
   })
 
   it('POST creates an event comment', async () => {

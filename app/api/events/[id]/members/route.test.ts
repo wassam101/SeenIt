@@ -25,7 +25,9 @@ describe('event members routes', () => {
   it('GET lists members', async () => {
     const res = await GET(new Request('http://localhost/api/events/event-1/members'), { params: { id: 'event-1' } })
     const json = await res.json()
-    expect(json.members).toEqual([{ userId: 'u1', displayName: 'Alice', joinedAt: '2026-01-01T00:00:00Z' }])
+    expect(json.members).toEqual([
+      { userId: 'u1', displayName: 'Alice', avatarUrl: null, joinedAt: '2026-01-01T00:00:00Z' },
+    ])
   })
 
   it('POST joins the event idempotently', async () => {
