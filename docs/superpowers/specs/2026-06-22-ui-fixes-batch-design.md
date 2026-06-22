@@ -65,3 +65,41 @@ Implementation: extend `Avatar` to manage its own open/closed lightbox state int
 
 - Manual verification in browser for each visual item (tab color, lightbox, location label).
 - For the anonymous-posting migration: verify via Supabase Studio that new posts/comments persist the correct `is_anonymous` value, and that the feed/profile/comments API responses correctly null out `authorId` per-item.
+
+---
+
+## 7. Profile header + Settings hub (Phase 1)
+
+Triggered by reviewing Instagram reference screenshots. This expands item 4 (profile/timeline) from "already works" into a full Instagram-style profile header plus a settings hub. Scoped as **Phase 1 of 2** — this phase covers the header, the settings navigation shell, profile-details editing, and account privacy. A later phase covers Saved posts, Notifications preferences, Blocked users, and Insights (view analytics) — each of those needs its own data model and is deliberately deferred.
+
+### 7.1 Profile header (`/u/[id]`)
+
+Redesign the header row to match the Instagram reference: avatar, display name, then a row of **posts / followers / following** counts (currently only followers/following are shown — add a posts count). `Edit profile` button replaces `FollowButton` when viewing your own profile; `FollowButton` continues to show on other people's profiles. A gear icon appears next to the name **only when viewing your own profile**, linking to the new settings hub.
+
+`app/api/users/[id]/route.ts` already returns `followerCount`/`followingCount`/`isSelf`; add a `postsCount` field (count of the author's non-deleted posts).
+
+### 7.2 Settings hub (`/account`)
+
+`/account` becomes a navigation menu (replacing today's single account-edit form), styled with one icon per row, grouped like the reference screenshots:
+
+- **Profile settings** → `/account/profile` (functional this phase)
+- **Account privacy** → `/account/privacy` (functional this phase)
+- **Saved**, **Notifications**, **Blocked**, **Insights** → listed with icons but rendered disabled/"Coming soon" this phase (no route yet) — kept visible so the menu reads as complete, matching the reference design, without faking functionality that isn't built.
+
+### 7.3 Profile settings (`/account/profile`)
+
+Moves the existing `AccountForm` content here (display name, first/last name, date of birth, bio, avatar upload — the anonymous-posting checkbox was already removed from here in section 5 above). Adds one new field: **location/city** (free-text, optional), stored as `profiles.location text`.
+
+### 7.4 Account privacy (`/account/privacy`)
+
+New `profiles.is_private boolean not null default false` column, edited via a simple public/private radio choice on this page (mirrors the "Account privacy" row in the reference).
+
+**Enforcement (simple mode, not full Instagram private-account behavior):** follow stays instant/one-way as today — no approval queue. When `is_private = true`, a post's content/media is only returned to: the author themselves, any of the author's followers, or — for already-public/anonymous posts — unaffected (anonymity and privacy are independent: an anonymous post from a private account still isn't attributed, and is still restricted to followers). Enforced in the API layer (not RLS) in the three places that already assemble post payloads with viewer context: `app/api/feed/route.ts`, `app/api/users/[id]/route.ts` (the profile's own post list), `app/api/posts/[id]/route.ts`. Posts from private accounts are simply omitted from results for non-follower viewers, rather than erroring.
+
+### Out of scope for Phase 1 (tracked for Phase 2)
+
+- Saved posts (needs a `saved_posts` table + save button + saved list view)
+- Notifications preferences (needs a notification-settings model — what notifications exist isn't defined yet)
+- Blocked users (needs a `blocks` table + block action + enforcement in feed/comments/follow)
+- Insights / view analytics (needs view-tracking, e.g. a `post_views` table or counter, + a stats UI)
+- Full Instagram-style follow-request approval for private accounts (deferred — simple hide-from-non-followers mode chosen instead)
