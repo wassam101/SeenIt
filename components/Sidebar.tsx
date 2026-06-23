@@ -1,26 +1,18 @@
 'use client'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { EyeIcon } from '@/components/icons/Eye'
-import {
-  PinIcon,
-  CameraIcon,
-  CompassIcon,
-  BellIcon,
-  CalendarIcon,
-  DiscussionIcon,
-  BookmarkIcon,
-  InsightsIcon,
-  ProfileIcon,
-  SettingsGearIcon,
-} from '@/components/icons/SidebarIcons'
 
 type NavItem = {
   label: string
   href: string
-  icon: (props: { className?: string }) => JSX.Element
+  icon: string
   comingSoon?: boolean
   active?: boolean
+}
+
+function NavIcon({ src, className }: { src: string; className?: string }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={src} alt="" className={className} />
 }
 
 export function Sidebar({ userId }: { userId: string }) {
@@ -29,19 +21,17 @@ export function Sidebar({ userId }: { userId: string }) {
   const isNearbyFeed = searchParams.get('feed') === 'nearby'
 
   const items: NavItem[] = [
-    { label: 'Home', href: '/', icon: (p) => <EyeIcon open {...p} />, active: pathname === '/' && !isNearbyFeed },
-    { label: 'Nearby', href: '/?feed=nearby', icon: PinIcon, active: pathname === '/' && isNearbyFeed },
-    { label: 'Share', href: '/post/new', icon: CameraIcon },
-    { label: 'Explore', href: '/explore', icon: CompassIcon, comingSoon: true },
-    { label: 'Updates', href: '/updates', icon: BellIcon, comingSoon: true },
-    // Events and Discussions both point at the events list for now: there's
-    // no separate "discussion board" feature yet, just event threads.
-    { label: 'Events', href: '/events', icon: CalendarIcon },
-    { label: 'Discussions', href: '/events', icon: DiscussionIcon },
-    { label: 'Saved', href: '/saved', icon: BookmarkIcon, comingSoon: true },
-    { label: 'Insights', href: '/insights', icon: InsightsIcon, comingSoon: true },
-    { label: 'Profile', href: `/u/${userId}`, icon: ProfileIcon },
-    { label: 'Settings', href: '/account', icon: SettingsGearIcon },
+    { label: 'Home', href: '/', icon: '/sidebar-icons/Home.png', active: pathname === '/' && !isNearbyFeed },
+    { label: 'Nearby', href: '/?feed=nearby', icon: '/sidebar-icons/Nearby.png', active: pathname === '/' && isNearbyFeed },
+    { label: 'Share', href: '/post/new', icon: '/sidebar-icons/Share.png' },
+    { label: 'Explore', href: '/explore', icon: '/sidebar-icons/Explore.png', comingSoon: true },
+    { label: 'Updates', href: '/updates', icon: '/sidebar-icons/Updates.png', comingSoon: true },
+    { label: 'Events', href: '/events', icon: '/sidebar-icons/Events.png' },
+    { label: 'Discussions', href: '/events', icon: '/sidebar-icons/Discussions.png' },
+    { label: 'Saved', href: '/saved', icon: '/sidebar-icons/Saved.png', comingSoon: true },
+    { label: 'Insights', href: '/insights', icon: '/sidebar-icons/Insights.png', comingSoon: true },
+    { label: 'Profile', href: `/u/${userId}`, icon: '/sidebar-icons/Profile.png' },
+    { label: 'Settings', href: '/account', icon: '/sidebar-icons/Settings.png' },
   ]
 
   return (
@@ -49,7 +39,7 @@ export function Sidebar({ userId }: { userId: string }) {
       aria-label="Main"
       className="hidden md:flex md:flex-col md:gap-1 md:w-56 md:shrink-0 md:py-6 md:pr-4 md:border-r md:border-evidence"
     >
-      {items.map(({ label, href, icon: Icon, comingSoon, active: explicitActive }) => {
+      {items.map(({ label, href, icon, comingSoon, active: explicitActive }) => {
         const active = !comingSoon && (explicitActive ?? pathname === href.split('?')[0])
         if (comingSoon) {
           return (
@@ -59,7 +49,7 @@ export function Sidebar({ userId }: { userId: string }) {
               className="flex items-center gap-3 px-3 py-2.5 font-mono text-[13px] text-slate/50 cursor-default"
               title="Coming soon"
             >
-              <Icon className="h-4 w-4" />
+              <NavIcon src={icon} className="h-7 w-7" />
               {label}
               <span className="ml-auto font-mono text-[9px] uppercase tracking-wider text-slate/40">Soon</span>
             </span>
@@ -73,7 +63,7 @@ export function Sidebar({ userId }: { userId: string }) {
               active ? 'text-signal' : 'text-ink hover:text-teal'
             }`}
           >
-            <Icon className="h-4 w-4" />
+            <NavIcon src={icon} className="h-7 w-7" />
             {label}
           </Link>
         )
