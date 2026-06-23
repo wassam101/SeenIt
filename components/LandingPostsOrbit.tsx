@@ -1,40 +1,31 @@
 type OrbitPost = { id: string; thumbnailUrl: string; caption: string | null }
 
-// Captions vary a lot in length. Earlier this stayed content-driven (no
-// clamp) so nothing was ever cut, but with 11 tiles now packed into three
-// tight zones, an unclamped caption is exactly what caused the bottom row
-// to occasionally clip against the panel edge — one long caption could push
-// a row's height past its margin. Clamping every caption to 2 lines makes
-// every tile the same fixed height, so the layout is fully deterministic:
-// no tile can ever grow into its neighbor, the text below it, or the panel
-// edge, no matter what the caption says. Normal-flow groups (flex-col for
-// the column, flex-row for the rows) still guarantee no overlap within
-// each group on top of that. The headline/subhead/logo block is centered
-// vertically in this panel (justify-center) and sits in its left ~74% on
-// md+ screens, leaving a clear band above and below it for a row of tiles,
-// plus the full-height strip to its right for a column of tiles. On
-// narrower screens that text is centered instead, so there's no safe gap
-// left for this decorative layer — it's hidden below the md breakpoint.
-// Only a small drift animation is layered on top via transform, which
-// doesn't affect layout, so the gaps between tiles comfortably absorb it.
-const TOP_ROW_TILES = [
-  { width: 100, duration: 12, delay: -3, orbitX: 6, orbitY: 6, rotate: -3 },
-  { width: 100, duration: 14, delay: -7, orbitX: 6, orbitY: 6, rotate: 3 },
-  { width: 100, duration: 11, delay: -9, orbitX: 6, orbitY: 6, rotate: -2 },
-  { width: 100, duration: 15, delay: -1, orbitX: 6, orbitY: 6, rotate: 2 },
-] as const
-
-const BOTTOM_ROW_TILES = [
-  { width: 100, duration: 13, delay: -2, orbitX: 6, orbitY: 6, rotate: 3 },
-  { width: 100, duration: 10, delay: -6, orbitX: 6, orbitY: 6, rotate: -3 },
-  { width: 100, duration: 16, delay: -4, orbitX: 6, orbitY: 6, rotate: 2 },
-  { width: 100, duration: 9, delay: -8, orbitX: 6, orbitY: 6, rotate: -2 },
-] as const
-
-const RIGHT_COLUMN_TILES = [
-  { width: 130, duration: 11, delay: -2, orbitX: 7, orbitY: 8, rotate: -3 },
-  { width: 130, duration: 13, delay: -5, orbitX: 6, orbitY: 7, rotate: 3 },
-  { width: 130, duration: 15, delay: -8, orbitX: 7, orbitY: 7, rotate: -2 },
+// Scattered, freely-overlapping placements rather than tidy non-overlapping
+// rows — a livelier "collage" feel was explicitly preferred over the earlier
+// tidy layout. The only hard constraint is staying clear of the text block,
+// which sits left-aligned on md+ screens at roughly x:0-64%, y:39-61% of
+// this panel (logo + headline + subhead, centered vertically via
+// justify-center). Every tile below keeps clear of that rectangle: tiles
+// with left < 64% stay entirely above y 39% or below y 61%; tiles with
+// left >= 64% can use any vertical position since they're already clear
+// horizontally. Captions are clamped to 2 lines so each tile's height is
+// deterministic, which is what makes that math reliable. On narrower
+// screens the text is centered instead, so there's no safe gap left for
+// this decorative layer — it's hidden below the md breakpoint.
+const TILE_PRESETS = [
+  { top: '2%', left: '5%', width: 110, duration: 13, delay: -2, orbitX: 14, orbitY: 16, rotate: -6 },
+  { top: '18%', left: '25%', width: 90, duration: 9, delay: -5, orbitX: 12, orbitY: 14, rotate: 5 },
+  { top: '3%', left: '45%', width: 130, duration: 16, delay: -8, orbitX: 16, orbitY: 12, rotate: -4 },
+  { top: '20%', left: '8%', width: 80, duration: 11, delay: -1, orbitX: 10, orbitY: 14, rotate: 7 },
+  { top: '70%', left: '10%', width: 100, duration: 14, delay: -6, orbitX: 14, orbitY: 16, rotate: -5 },
+  { top: '80%', left: '30%', width: 90, duration: 10, delay: -3, orbitX: 12, orbitY: 12, rotate: 4 },
+  { top: '65%', left: '48%', width: 110, duration: 18, delay: -9, orbitX: 16, orbitY: 14, rotate: -3 },
+  { top: '75%', left: '5%', width: 70, duration: 8, delay: -4, orbitX: 10, orbitY: 10, rotate: 6 },
+  { top: '5%', left: '70%', width: 120, duration: 15, delay: -7, orbitX: 18, orbitY: 16, rotate: -5 },
+  { top: '25%', left: '80%', width: 100, duration: 12, delay: -2.5, orbitX: 14, orbitY: 18, rotate: 6 },
+  { top: '45%', left: '68%', width: 130, duration: 17, delay: -10, orbitX: 16, orbitY: 14, rotate: -4 },
+  { top: '60%', left: '82%', width: 90, duration: 9, delay: -6.5, orbitX: 12, orbitY: 16, rotate: 5 },
+  { top: '80%', left: '70%', width: 110, duration: 13, delay: -4.5, orbitX: 14, orbitY: 12, rotate: -6 },
 ] as const
 
 function OrbitTile({
@@ -42,13 +33,15 @@ function OrbitTile({
   preset,
 }: {
   post: OrbitPost
-  preset: { width: number; duration: number; delay: number; orbitX: number; orbitY: number; rotate: number }
+  preset: { top: string; left: string; width: number; duration: number; delay: number; orbitX: number; orbitY: number; rotate: number }
 }) {
   return (
     <div
-      className="post-orbit shrink-0 rounded-xl overflow-hidden bg-paper/10 backdrop-blur-sm border border-paper/25 shadow-lg shadow-ink/20"
+      className="post-orbit absolute rounded-xl overflow-hidden bg-paper/10 backdrop-blur-sm border border-paper/25 shadow-lg shadow-ink/20"
       style={
         {
+          top: preset.top,
+          left: preset.left,
           width: preset.width,
           animationDuration: `${preset.duration}s`,
           animationDelay: `${preset.delay}s`,
@@ -67,27 +60,13 @@ function OrbitTile({
 }
 
 export function LandingPostsOrbit({ posts }: { posts: OrbitPost[] }) {
-  const topTiles = posts.slice(0, TOP_ROW_TILES.length)
-  const bottomTiles = posts.slice(topTiles.length, topTiles.length + BOTTOM_ROW_TILES.length)
-  const rightTiles = posts.slice(topTiles.length + bottomTiles.length, topTiles.length + bottomTiles.length + RIGHT_COLUMN_TILES.length)
+  const tiles = posts.slice(0, TILE_PRESETS.length)
 
   return (
     <div className="absolute inset-0 overflow-hidden hidden md:block" aria-hidden="true">
-      <div className="absolute top-8 left-4 right-[170px] flex flex-row gap-2">
-        {topTiles.map((post, i) => (
-          <OrbitTile key={post.id} post={post} preset={TOP_ROW_TILES[i]} />
-        ))}
-      </div>
-      <div className="absolute bottom-12 left-4 right-[170px] flex flex-row gap-2">
-        {bottomTiles.map((post, i) => (
-          <OrbitTile key={post.id} post={post} preset={BOTTOM_ROW_TILES[i]} />
-        ))}
-      </div>
-      <div className="absolute top-3 right-3 w-[130px] flex flex-col gap-3">
-        {rightTiles.map((post, i) => (
-          <OrbitTile key={post.id} post={post} preset={RIGHT_COLUMN_TILES[i]} />
-        ))}
-      </div>
+      {tiles.map((post, i) => (
+        <OrbitTile key={post.id} post={post} preset={TILE_PRESETS[i]} />
+      ))}
     </div>
   )
 }

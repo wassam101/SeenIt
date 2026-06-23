@@ -40,8 +40,8 @@ describe('LandingPage', () => {
     expect(loginLink.getAttribute('href')).toBe('/login')
   })
 
-  it('shows the latest posts drifting in the background, capped at 11', async () => {
-    mockRows = Array.from({ length: 13 }, (_, i) => ({
+  it('shows the latest posts drifting in the background, capped at 13', async () => {
+    mockRows = Array.from({ length: 20 }, (_, i) => ({
       id: `p${i}`,
       thumbnail_url: `https://thumb.example/${i}.jpg`,
       caption: `post ${i}`,
@@ -49,6 +49,6 @@ describe('LandingPage', () => {
     const { container } = render(await LandingPage())
     const tileCount = container.querySelectorAll('img').length
     expect(tileCount).toBeGreaterThan(0)
-    expect(tileCount).toBeLessThanOrEqual(11)
+    expect(tileCount).toBeLessThanOrEqual(13)
   })
 })

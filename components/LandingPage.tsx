@@ -12,7 +12,7 @@ async function getLatestThumbnails() {
     .not('thumbnail_url', 'is', null)
     .is('deleted_at', null)
     .order('created_at', { ascending: false })
-    .limit(11)
+    .limit(13)
 
   return (data ?? []).map((row: any) => ({
     id: row.id,

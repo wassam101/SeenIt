@@ -13,11 +13,11 @@ function makePosts(count: number) {
 }
 
 describe('LandingPostsOrbit', () => {
-  it('renders a tile per post, capped at the number of non-overlapping slots even when given more', () => {
-    const { container } = render(<LandingPostsOrbit posts={makePosts(15)} />)
+  it('renders a tile per post, capped at the number of placement slots even when given more', () => {
+    const { container } = render(<LandingPostsOrbit posts={makePosts(20)} />)
     const tileCount = container.querySelectorAll('img').length
     expect(tileCount).toBeGreaterThan(0)
-    expect(tileCount).toBeLessThanOrEqual(11)
+    expect(tileCount).toBeLessThanOrEqual(13)
   })
 
   it('renders fewer tiles when fewer posts are available', () => {
