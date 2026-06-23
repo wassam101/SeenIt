@@ -25,7 +25,7 @@ export async function LandingPage() {
   const posts = await getLatestThumbnails()
 
   return (
-    <div className="grid md:grid-cols-2 md:min-h-[760px]">
+    <div className="grid md:grid-cols-2 md:min-h-[880px]">
       <div className="relative bg-teal text-paper px-6 py-12 md:py-16 flex flex-col items-center md:items-start justify-center text-center md:text-left overflow-hidden">
         <LandingPostsOrbit posts={posts} />
         <div className="relative z-10 max-w-md">

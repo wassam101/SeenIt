@@ -73,12 +73,12 @@ export function LandingPostsOrbit({ posts }: { posts: OrbitPost[] }) {
 
   return (
     <div className="absolute inset-0 overflow-hidden hidden md:block" aria-hidden="true">
-      <div className="absolute top-5 left-4 right-[170px] flex flex-row gap-2">
+      <div className="absolute top-8 left-4 right-[170px] flex flex-row gap-2">
         {topTiles.map((post, i) => (
           <OrbitTile key={post.id} post={post} preset={TOP_ROW_TILES[i]} />
         ))}
       </div>
-      <div className="absolute bottom-6 left-4 right-[170px] flex flex-row gap-2">
+      <div className="absolute bottom-12 left-4 right-[170px] flex flex-row gap-2">
         {bottomTiles.map((post, i) => (
           <OrbitTile key={post.id} post={post} preset={BOTTOM_ROW_TILES[i]} />
         ))}
