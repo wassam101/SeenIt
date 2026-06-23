@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { Avatar } from '@/components/Avatar'
 import { FollowButton } from '@/components/FollowButton'
-import { PostCard } from '@/components/PostCard'
+import { ProfileTimeline } from '@/components/ProfileTimeline'
 
 async function getProfile(id: string) {
   const cookieHeader = cookies()
@@ -44,21 +44,9 @@ export default async function ProfilePage({ params }: { params: { id: string } }
 
       <div className="mt-8 border-t border-evidence pt-6">
         <p className="font-mono text-[11px] uppercase tracking-wider text-slate mb-4">
-          {profile.posts.length} {profile.posts.length === 1 ? 'report' : 'reports'}
+          {profile.postsCount} {profile.postsCount === 1 ? 'report' : 'reports'}
         </p>
-        {profile.posts.length === 0 ? (
-          <p className="font-mono text-xs text-slate border border-dashed border-evidence px-3 py-6 text-center">
-            No reports yet.
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-4">
-            {profile.posts.map((post: any) => (
-              <li key={post.id}>
-                <PostCard post={post} />
-              </li>
-            ))}
-          </ul>
-        )}
+        <ProfileTimeline userId={profile.id} initialPosts={profile.posts} initialNextCursor={profile.nextPostsCursor} />
       </div>
     </div>
   )

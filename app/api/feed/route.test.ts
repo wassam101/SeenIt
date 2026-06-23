@@ -10,6 +10,7 @@ function chain(rows: any[]) {
     is: (...args: any[]) => { calls.push(['is', ...args]); return builder },
     gte: (...args: any[]) => { calls.push(['gte', ...args]); return builder },
     lte: (...args: any[]) => { calls.push(['lte', ...args]); return builder },
+    lt: (...args: any[]) => { calls.push(['lt', ...args]); return builder },
     order: (...args: any[]) => { calls.push(['order', ...args]); return builder },
     limit: async () => ({ data: rows, error: null }),
   }
@@ -43,5 +44,12 @@ describe('GET /api/feed', () => {
   it('requires lat/lng for nearby mode', async () => {
     const res = await GET(new Request('http://localhost/api/feed?mode=nearby'))
     expect(res.status).toBe(400)
+  })
+
+  it('applies a cursor to fetch posts older than the given timestamp', async () => {
+    calls.length = 0
+    const res = await GET(new Request('http://localhost/api/feed?mode=global&cursor=2026-01-01T00:00:00Z'))
+    expect(res.status).toBe(200)
+    expect(calls).toContainEqual(['lt', 'created_at', '2026-01-01T00:00:00Z'])
   })
 })

@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useCurrentLocation } from '@/lib/location/use-current-location'
 import { PostCard } from './PostCard'
@@ -22,7 +22,10 @@ export function FeedTabs() {
   const [tab, setTab] = useState<'global' | 'nearby'>(searchParams.get('feed') === 'nearby' ? 'nearby' : 'global')
   const [radiusKm, setRadiusKm] = useState(10)
   const [posts, setPosts] = useState<Post[]>([])
+  const [nextCursor, setNextCursor] = useState<string | null>(null)
+  const [loadingMore, setLoadingMore] = useState(false)
   const location = useCurrentLocation()
+  const sentinelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Syncs the tab when navigated to via a link carrying ?feed=nearby
@@ -31,18 +34,47 @@ export function FeedTabs() {
     setTab(searchParams.get('feed') === 'nearby' ? 'nearby' : 'global')
   }, [searchParams])
 
-  useEffect(() => {
-    if (tab === 'nearby' && !location) return
+  function buildParams(cursor?: string) {
     const params = new URLSearchParams({ mode: tab })
     if (tab === 'nearby' && location) {
       params.set('lat', String(location.lat))
       params.set('lng', String(location.lng))
       params.set('radiusKm', String(radiusKm))
     }
-    fetch(`/api/feed?${params}`)
+    if (cursor) params.set('cursor', cursor)
+    return params
+  }
+
+  useEffect(() => {
+    if (tab === 'nearby' && !location) return
+    fetch(`/api/feed?${buildParams()}`)
       .then((res) => res.json())
-      .then((data) => setPosts(data.posts))
+      .then((data) => {
+        setPosts(data.posts)
+        setNextCursor(data.nextCursor)
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, location, radiusKm])
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel || !nextCursor) return
+
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries[0]?.isIntersecting || loadingMore) return
+      setLoadingMore(true)
+      fetch(`/api/feed?${buildParams(nextCursor)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setPosts((prev) => [...prev, ...data.posts])
+          setNextCursor(data.nextCursor)
+        })
+        .finally(() => setLoadingMore(false))
+    })
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nextCursor, tab, location, radiusKm, loadingMore])
 
   return (
     <div>
@@ -101,6 +133,10 @@ export function FeedTabs() {
             </li>
           ))}
         </ul>
+      )}
+      {nextCursor && <div ref={sentinelRef} className="h-1" aria-hidden="true" />}
+      {loadingMore && (
+        <p className="font-mono text-xs text-slate text-center py-4">Loading more&hellip;</p>
       )}
     </div>
   )

@@ -2,7 +2,11 @@ import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { publicDisplayName, publicAvatarUrl } from '@/lib/profile/public-name'
 
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+const PAGE_SIZE = 11
+
+export async function GET(request: Request, { params }: { params: { id: string } }) {
+  const url = new URL(request.url)
+  const cursor = url.searchParams.get('cursor')
   const supabase = createServerSupabase()
 
   const { data: profile, error: profileError } = await supabase
@@ -15,13 +19,25 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: 'not found' }, { status: 404 })
   }
 
-  const { data: postsData } = await supabase
+  const { count: postsCount } = await supabase
+    .from('posts')
+    .select('*', { count: 'exact', head: true })
+    .eq('author_id', params.id)
+    .eq('status', 'ready')
+    .is('deleted_at', null)
+
+  let postsQuery = supabase
     .from('posts')
     .select('id, caption, thumbnail_url, location_label, created_at')
     .eq('author_id', params.id)
     .eq('status', 'ready')
     .is('deleted_at', null)
-    .order('created_at', { ascending: false })
+
+  if (cursor) {
+    postsQuery = postsQuery.lt('created_at', cursor)
+  }
+
+  const { data: postsData } = await postsQuery.order('created_at', { ascending: false }).limit(PAGE_SIZE)
 
   const { count: followerCount } = await supabase
     .from('follows')
@@ -47,6 +63,15 @@ export async function GET(_request: Request, { params }: { params: { id: string 
 
   const name = publicDisplayName(profile)
   const avatarUrl = publicAvatarUrl(profile)
+  const posts = (postsData ?? []).map((p: any) => ({
+    id: p.id,
+    authorName: name,
+    authorAvatarUrl: avatarUrl,
+    thumbnailUrl: p.thumbnail_url,
+    caption: p.caption,
+    locationLabel: p.location_label,
+    createdAt: p.created_at,
+  }))
 
   return NextResponse.json({
     id: profile.id,
@@ -57,14 +82,8 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     followingCount: followingCount ?? 0,
     isFollowing,
     isSelf: userData.user?.id === params.id,
-    posts: (postsData ?? []).map((p: any) => ({
-      id: p.id,
-      authorName: name,
-      authorAvatarUrl: avatarUrl,
-      thumbnailUrl: p.thumbnail_url,
-      caption: p.caption,
-      locationLabel: p.location_label,
-      createdAt: p.created_at,
-    })),
+    postsCount: postsCount ?? 0,
+    posts,
+    nextPostsCursor: posts.length === PAGE_SIZE ? posts[posts.length - 1].createdAt : null,
   })
 }

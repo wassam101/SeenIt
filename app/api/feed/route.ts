@@ -3,12 +3,13 @@ import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { publicDisplayName, publicAvatarUrl } from '@/lib/profile/public-name'
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 11
 const KM_PER_DEGREE_LAT = 111
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
   const mode = url.searchParams.get('mode') ?? 'global'
+  const cursor = url.searchParams.get('cursor')
   const supabase = createServerSupabase()
 
   let query = supabase
@@ -16,6 +17,10 @@ export async function GET(request: Request) {
     .select('id, author_id, caption, thumbnail_url, location_label, created_at, profiles!posts_author_id_fkey(display_name, avatar_url, is_anonymous)')
     .eq('status', 'ready')
     .is('deleted_at', null)
+
+  if (cursor) {
+    query = query.lt('created_at', cursor)
+  }
 
   if (mode === 'nearby') {
     const latParam = url.searchParams.get('lat')
