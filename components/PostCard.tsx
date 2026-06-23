@@ -14,6 +14,7 @@ type Post = {
   thumbnailUrl: string | null
   caption: string | null
   createdAt?: string
+  locationLabel?: string | null
 }
 
 export function PostCard({ post }: { post: Post }) {
@@ -31,7 +32,7 @@ export function PostCard({ post }: { post: Post }) {
       <div className="flex items-center justify-between px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider text-slate">
         <span className="flex items-center gap-1.5">
           <span className="size-1.5 rounded-full bg-signal rec-dot" aria-hidden="true" />
-          Witness report
+          {post.locationLabel ? `Seen at ${post.locationLabel}` : 'Seen'}
         </span>
         {post.createdAt && <span>{formatRelativeTime(post.createdAt)}</span>}
       </div>

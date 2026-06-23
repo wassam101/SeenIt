@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
   let query = supabase
     .from('posts')
-    .select('id, author_id, caption, thumbnail_url, created_at, profiles!posts_author_id_fkey(display_name, avatar_url, is_anonymous)')
+    .select('id, author_id, caption, thumbnail_url, location_label, created_at, profiles!posts_author_id_fkey(display_name, avatar_url, is_anonymous)')
     .eq('status', 'ready')
     .is('deleted_at', null)
 
@@ -48,6 +48,7 @@ export async function GET(request: Request) {
     authorAvatarUrl: publicAvatarUrl(row.profiles),
     thumbnailUrl: row.thumbnail_url,
     caption: row.caption,
+    locationLabel: row.location_label,
     createdAt: row.created_at,
   }))
 

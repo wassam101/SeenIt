@@ -51,9 +51,9 @@ export default async function PostPage({ params }: { params: { id: string } }) {
         <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-wider text-slate">
           <span className="flex items-center gap-1.5">
             <span className="size-1.5 rounded-full bg-signal rec-dot" aria-hidden="true" />
-            Witness report{post.createdAt ? ` · ${formatRelativeTime(post.createdAt)}` : ''}
+            {post.locationLabel ? `Seen at ${post.locationLabel}` : 'Seen'}
           </span>
-          {post.locationLabel && <span>{post.locationLabel}</span>}
+          {post.createdAt && <span>{formatRelativeTime(post.createdAt)}</span>}
         </div>
 
         <p className="font-display font-bold text-xl mt-2 leading-snug">{post.caption}</p>

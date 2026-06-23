@@ -17,7 +17,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
 
   const { data: postsData } = await supabase
     .from('posts')
-    .select('id, caption, thumbnail_url, created_at')
+    .select('id, caption, thumbnail_url, location_label, created_at')
     .eq('author_id', params.id)
     .eq('status', 'ready')
     .is('deleted_at', null)
@@ -63,6 +63,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
       authorAvatarUrl: avatarUrl,
       thumbnailUrl: p.thumbnail_url,
       caption: p.caption,
+      locationLabel: p.location_label,
       createdAt: p.created_at,
     })),
   })

@@ -42,19 +42,19 @@ export function FeedTabs() {
             onClick={() => setTab('global')}
             aria-pressed={tab === 'global'}
             className={`px-3 py-1.5 transition-colors ${
-              tab === 'global' ? 'bg-ink text-paper' : 'text-slate hover:text-ink'
+              tab === 'global' ? 'bg-teal text-paper' : 'text-slate hover:text-ink'
             }`}
           >
-            Seen Global
+            Global
           </button>
           <button
             onClick={() => setTab('nearby')}
             aria-pressed={tab === 'nearby'}
             className={`px-3 py-1.5 transition-colors ${
-              tab === 'nearby' ? 'bg-ink text-paper' : 'text-slate hover:text-ink'
+              tab === 'nearby' ? 'bg-teal text-paper' : 'text-slate hover:text-ink'
             }`}
           >
-            Seen Nearby
+            Nearby
           </button>
         </div>
         {tab === 'nearby' && (
