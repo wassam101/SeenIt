@@ -74,6 +74,28 @@ body {
   }
 }
 
+/* Ambient drift for the latest-posts collage on the landing page — each tile
+   loops a small ellipse (right/up, top, left/up, back) at its own speed via
+   --orbit-x/--orbit-y/--orbit-rotate, so the cluster reads as alive without
+   any tile repeating the same path. */
+@keyframes post-orbit {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(var(--orbit-x), calc(var(--orbit-y) * -1)) rotate(var(--orbit-rotate)); }
+  50% { transform: translate(0, calc(var(--orbit-y) * -1.6)) rotate(0deg); }
+  75% { transform: translate(calc(var(--orbit-x) * -1), calc(var(--orbit-y) * -1)) rotate(calc(var(--orbit-rotate) * -1)); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.post-orbit {
+  animation: post-orbit ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post-orbit {
+    animation: none;
+  }
+}
+
 /* Viewfinder corner brackets — the "captured footage" frame for post media */
 .viewfinder {
   position: relative;

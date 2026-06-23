@@ -2,8 +2,16 @@ import { Suspense } from 'react'
 import { FeedTabs } from '@/components/FeedTabs'
 import { EyeLogo } from '@/components/icons/Logo'
 import { WelcomeBanner } from '@/components/WelcomeBanner'
+import { LandingPage } from '@/components/LandingPage'
+import { createServerSupabase } from '@/lib/supabase/server'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = createServerSupabase()
+  const { data } = await supabase.auth.getUser()
+  if (!data.user) {
+    return <LandingPage />
+  }
+
   return (
     <div>
       <Suspense fallback={null}>

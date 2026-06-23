@@ -12,10 +12,19 @@ export function createServerSupabase() {
         return cookieStore.get(name)?.value
       },
       set(name: string, value: string, options) {
-        cookieStore.set(name, value, options)
+        try {
+          cookieStore.set(name, value, options)
+        } catch {
+          // Called from a Server Component during render, where cookies are read-only.
+          // Safe to ignore: the session cookie is still set on the next Server Action/Route Handler call.
+        }
       },
       remove(name: string, options) {
-        cookieStore.set(name, '', { ...options, maxAge: 0 })
+        try {
+          cookieStore.set(name, '', { ...options, maxAge: 0 })
+        } catch {
+          // Called from a Server Component during render, where cookies are read-only.
+        }
       },
     },
   })

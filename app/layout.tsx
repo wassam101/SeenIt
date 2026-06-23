@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Fraunces } from "next/font/google";
-import Link from "next/link";
-import { EyeLogo } from "@/components/icons/Logo";
-import { Avatar } from "@/components/Avatar";
+import { SiteHeader } from "@/components/SiteHeader";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { signOut } from "@/app/(auth)/actions";
 import "./globals.css";
 
 const display = Fraunces({
@@ -57,50 +54,7 @@ export default async function RootLayout({
       className={`${display.variable} ${sans.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-paper text-ink">
-        <header className="border-b border-evidence sticky top-0 z-10 bg-paper/95 backdrop-blur-sm">
-          <div className="mx-auto max-w-2xl px-4 py-3 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 group">
-              <EyeLogo className="h-8 w-12" />
-              <span className="font-display italic font-semibold text-xl tracking-tight text-ink">SeenIt</span>
-            </Link>
-            <nav className="flex items-center gap-4 font-mono text-[13px] font-medium text-slate">
-              {displayName ? (
-                <>
-                  <Link href="/account" className="flex items-center gap-2 text-ink hover:text-teal transition-colors">
-                    <Avatar name={displayName} avatarUrl={avatarUrl} size={28} />
-                    <strong className="font-semibold">{displayName}</strong>
-                  </Link>
-                  <Link href="/post/new" className="hover:text-teal transition-colors">
-                    Post
-                  </Link>
-                  <form action={signOut}>
-                    <button
-                      type="submit"
-                      className="text-paper bg-teal px-3 py-1.5 rounded-full hover:bg-signal transition-colors"
-                    >
-                      Log out
-                    </button>
-                  </form>
-                </>
-              ) : (
-                <>
-                  <Link href="/post/new" className="hover:text-teal transition-colors">
-                    Post
-                  </Link>
-                  <Link href="/login" className="hover:text-teal transition-colors">
-                    Log in
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="text-paper bg-teal px-3 py-1.5 rounded-full hover:bg-signal transition-colors"
-                  >
-                    Sign up
-                  </Link>
-                </>
-              )}
-            </nav>
-          </div>
-        </header>
+        <SiteHeader displayName={displayName} avatarUrl={avatarUrl} />
         <main className="flex-1">{children}</main>
       </body>
     </html>
