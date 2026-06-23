@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useCurrentLocation } from '@/lib/location/use-current-location'
 import { PostCard } from './PostCard'
 
@@ -11,15 +12,24 @@ type Post = {
   thumbnailUrl: string | null
   caption: string | null
   createdAt: string
+  locationLabel?: string | null
 }
 
 const RADIUS_OPTIONS_KM = [1, 5, 10, 20, 50, 100]
 
 export function FeedTabs() {
-  const [tab, setTab] = useState<'global' | 'nearby'>('global')
+  const searchParams = useSearchParams()
+  const [tab, setTab] = useState<'global' | 'nearby'>(searchParams.get('feed') === 'nearby' ? 'nearby' : 'global')
   const [radiusKm, setRadiusKm] = useState(10)
   const [posts, setPosts] = useState<Post[]>([])
   const location = useCurrentLocation()
+
+  useEffect(() => {
+    // Syncs the tab when navigated to via a link carrying ?feed=nearby
+    // (e.g. the sidebar's Nearby item) rather than clicking the tab itself,
+    // since useState's initializer only runs on the first mount.
+    setTab(searchParams.get('feed') === 'nearby' ? 'nearby' : 'global')
+  }, [searchParams])
 
   useEffect(() => {
     if (tab === 'nearby' && !location) return

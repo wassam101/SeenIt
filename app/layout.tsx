@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Plus_Jakarta_Sans, Fraunces } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
+import { Sidebar } from "@/components/Sidebar";
 import { createServerSupabase } from "@/lib/supabase/server";
 import "./globals.css";
 
@@ -55,7 +57,16 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-paper text-ink">
         <SiteHeader displayName={displayName} avatarUrl={avatarUrl} />
-        <main className="flex-1">{children}</main>
+        {userData.user ? (
+          <div className="flex-1 mx-auto w-full max-w-5xl flex md:px-4">
+            <Suspense fallback={null}>
+              <Sidebar userId={userData.user.id} />
+            </Suspense>
+            <main className="flex-1 min-w-0">{children}</main>
+          </div>
+        ) : (
+          <main className="flex-1">{children}</main>
+        )}
       </body>
     </html>
   );

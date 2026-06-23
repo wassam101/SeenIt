@@ -32,7 +32,9 @@ export default async function HomePage() {
         </div>
       </section>
       <div className="mx-auto max-w-2xl px-4 py-6">
-        <FeedTabs />
+        <Suspense fallback={null}>
+          <FeedTabs />
+        </Suspense>
       </div>
     </div>
   )
