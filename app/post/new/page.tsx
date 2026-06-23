@@ -95,7 +95,7 @@ export default function NewPostPage() {
 
   return (
     <div className="mx-auto max-w-sm px-4 py-10">
-      <p className="font-mono text-[11px] uppercase tracking-wider text-slate mb-1">I witnessed it</p>
+      <p className="font-mono text-[11px] uppercase tracking-wider text-slate mb-1">SeenIt</p>
       <h1 className="font-display font-bold text-2xl mb-6">Post what you saw</h1>
       <form action={handleSubmit} className="flex flex-col gap-4">
         {error && (
