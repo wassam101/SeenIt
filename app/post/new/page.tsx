@@ -4,7 +4,10 @@ import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCurrentLocation } from '@/lib/location/use-current-location'
 import { reverseGeocode } from '@/lib/location/reverse-geocode'
+import { searchAddress, type AddressSuggestion } from '@/lib/location/search-address'
 import { createBrowserSupabase } from '@/lib/supabase/client'
+
+const ADDRESS_SEARCH_DEBOUNCE_MS = 350
 
 export default function NewPostPage() {
   const router = useRouter()
@@ -13,8 +16,31 @@ export default function NewPostPage() {
   const [uploading, setUploading] = useState(false)
   const [locatingLabel, setLocatingLabel] = useState(false)
   const [locationLabel, setLocationLabel] = useState('')
+  const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([])
+  const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [preview, setPreview] = useState<{ kind: 'image' | 'video'; url: string; name: string } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout>>()
+
+  function handleLocationInput(value: string) {
+    setLocationLabel(value)
+    setSelectedCoords(null)
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
+    if (!value.trim()) {
+      setSuggestions([])
+      return
+    }
+    searchTimerRef.current = setTimeout(async () => {
+      setSuggestions(await searchAddress(value))
+    }, ADDRESS_SEARCH_DEBOUNCE_MS)
+  }
+
+  function selectSuggestion(suggestion: AddressSuggestion) {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
+    setLocationLabel(suggestion.label)
+    setSelectedCoords({ lat: suggestion.lat, lng: suggestion.lng })
+    setSuggestions([])
+  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -37,6 +63,8 @@ export default function NewPostPage() {
         const { latitude, longitude } = position.coords
         const place = await reverseGeocode(latitude, longitude)
         setLocationLabel(place ?? `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`)
+        setSelectedCoords({ lat: latitude, lng: longitude })
+        setSuggestions([])
         setLocatingLabel(false)
       },
       () => {
@@ -80,8 +108,8 @@ export default function NewPostPage() {
           ...postBody,
           caption,
           locationLabel,
-          lat: location?.lat,
-          lng: location?.lng,
+          lat: selectedCoords?.lat ?? location?.lat,
+          lng: selectedCoords?.lng ?? location?.lng,
         }),
       })
       if (!postRes.ok) throw new Error('Could not create post')
@@ -139,14 +167,15 @@ export default function NewPostPage() {
           <span className="block font-mono text-[11px] uppercase tracking-wider text-slate mb-1">Caption</span>
           <textarea name="caption" rows={3} className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink" />
         </label>
-        <div>
-          <span className="block font-mono text-[11px] uppercase tracking-wider text-slate mb-1">Location</span>
+        <div className="relative">
+          <span className="block font-mono text-[11px] uppercase tracking-wider text-slate mb-1">SeenIt at</span>
           <div className="flex gap-2">
             <input
               name="locationLabel"
               value={locationLabel}
-              onChange={(e) => setLocationLabel(e.target.value)}
-              placeholder="e.g. Main St & 5th"
+              onChange={(e) => handleLocationInput(e.target.value)}
+              placeholder="e.g. Starbucks, 6030 Main St W, Milton, ON"
+              autoComplete="off"
               required
               className="flex-1 border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink"
             />
@@ -159,6 +188,21 @@ export default function NewPostPage() {
               {locatingLabel ? 'Locating…' : 'Share my location'}
             </button>
           </div>
+          {suggestions.length > 0 && (
+            <ul className="absolute left-0 top-full mt-1 z-10 w-full bg-white border border-ink shadow-sm max-h-56 overflow-auto">
+              {suggestions.map((suggestion, i) => (
+                <li key={`${suggestion.label}-${i}`}>
+                  <button
+                    type="button"
+                    onClick={() => selectSuggestion(suggestion)}
+                    className="w-full text-left font-mono text-xs px-3 py-2 hover:bg-paper transition-colors"
+                  >
+                    {suggestion.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
         <button
           type="submit"

@@ -1,14 +1,16 @@
-export async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
-  const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
-  if (!token) return null
+import { formatAddressLabel } from './format-address'
 
+const USER_AGENT = 'SeenIt (community safety app, local dev) contact: support@seenit.local'
+
+export async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
   try {
     const res = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${token}&limit=1`
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`,
+      { headers: { 'User-Agent': USER_AGENT } }
     )
     if (!res.ok) return null
     const json = await res.json()
-    return json.features?.[0]?.place_name ?? null
+    return formatAddressLabel(json)
   } catch {
     return null
   }
