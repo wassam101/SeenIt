@@ -113,8 +113,8 @@ export default function NewPostPage() {
         }),
       })
       if (!postRes.ok) throw new Error('Could not create post')
-      const post = await postRes.json()
-      router.push(`/post/${post.id}`)
+      await postRes.json()
+      router.push('/')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
       setUploading(false)

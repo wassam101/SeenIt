@@ -1,10 +1,14 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { formatRelativeTime } from '@/lib/time'
 import { EyeIcon } from '@/components/icons/Eye'
 import { Avatar } from '@/components/Avatar'
+import { SeenItButton } from '@/components/SeenItButton'
+import { ShareButton } from '@/components/ShareButton'
+import { ReportButton } from '@/components/ReportButton'
+import { PostEventLauncher } from '@/components/PostEventLauncher'
+import { CommentThread } from '@/components/CommentThread'
 
 type Post = {
   id: string
@@ -17,57 +21,129 @@ type Post = {
   locationLabel?: string | null
 }
 
+type PostDetails = {
+  mediaType: 'image' | 'video'
+  videoId: string | null
+  imageUrl: string | null
+  status: string
+  caption: string | null
+  commentCount: number
+}
+
 export function PostCard({ post }: { post: Post }) {
-  const router = useRouter()
   const [imageFailed, setImageFailed] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+  const [commentsOpen, setCommentsOpen] = useState(false)
+  const [details, setDetails] = useState<PostDetails | null>(null)
+  const [loadingDetails, setLoadingDetails] = useState(false)
   const showImage = post.thumbnailUrl && !imageFailed
 
+  async function toggleExpanded() {
+    if (expanded) {
+      setExpanded(false)
+      return
+    }
+    setExpanded(true)
+    if (details || loadingDetails) return
+    setLoadingDetails(true)
+    const res = await fetch(`/api/posts/${post.id}`)
+    if (res.ok) setDetails(await res.json())
+    setLoadingDetails(false)
+  }
+
   return (
-    <div
-      onClick={() => router.push(`/post/${post.id}`)}
-      role="link"
-      tabIndex={0}
-      className="block bg-white/40 hover:bg-white transition-colors cursor-pointer"
-    >
-      <div className="flex items-center justify-between px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider text-slate">
-        <span className="flex items-center gap-1.5">
-          <span className="size-1.5 rounded-full bg-signal rec-dot" aria-hidden="true" />
-          {post.locationLabel ? `Seen at ${post.locationLabel}` : 'Seen'}
-        </span>
-        {post.createdAt && <span>{formatRelativeTime(post.createdAt)}</span>}
-      </div>
-      <div className="aspect-video bg-ink/90 flex items-center justify-center overflow-hidden">
-        {showImage ? (
-          <img
-            src={post.thumbnailUrl!}
-            alt={post.caption ?? ''}
-            onError={() => setImageFailed(true)}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <EyeIcon open={false} className="h-6 w-10 text-paper/25" />
-        )}
-      </div>
-      <div className="px-3 py-3">
-        <p className="font-display font-bold text-base leading-snug">{post.caption}</p>
-        <div className="flex items-center gap-1.5 mt-2">
-          {post.authorId ? (
-            <Link
-              href={`/u/${post.authorId}`}
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 hover:text-teal"
-            >
-              <Avatar name={post.authorName} avatarUrl={post.authorAvatarUrl} size={18} />
-              <p className="font-mono text-xs text-slate">{post.authorName}</p>
-            </Link>
+    <div className="bg-white/40 hover:bg-white transition-colors">
+      <div
+        onClick={toggleExpanded}
+        role="button"
+        tabIndex={0}
+        aria-expanded={expanded}
+        className="cursor-pointer"
+      >
+        <div className="flex items-center justify-between px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider text-slate">
+          <span className="flex items-center gap-1.5">
+            <span className="size-1.5 rounded-full bg-signal rec-dot" aria-hidden="true" />
+            {post.locationLabel ? `Seen at ${post.locationLabel}` : 'Seen'}
+          </span>
+          {post.createdAt && <span>{formatRelativeTime(post.createdAt)}</span>}
+        </div>
+        <div className="aspect-video bg-ink/90 flex items-center justify-center overflow-hidden">
+          {expanded && details?.mediaType === 'image' && details.imageUrl ? (
+            <img src={details.imageUrl} alt={post.caption ?? ''} className="w-full h-full object-cover" />
+          ) : expanded && details?.mediaType === 'video' ? (
+            details.status === 'ready' ? (
+              <iframe
+                src={`https://customer-${process.env.NEXT_PUBLIC_CF_STREAM_CUSTOMER_CODE}.cloudflarestream.com/${details.videoId}/iframe`}
+                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                allowFullScreen
+                title={post.caption ?? 'Post video'}
+                className="w-full h-full"
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <div className="flex flex-col items-center gap-2">
+                <EyeIcon open={false} className="h-7 w-12 text-paper/30" />
+                <p className="font-mono text-xs text-paper/50 uppercase tracking-wider">Footage processing&hellip;</p>
+              </div>
+            )
+          ) : showImage ? (
+            <img
+              src={post.thumbnailUrl!}
+              alt={post.caption ?? ''}
+              onError={() => setImageFailed(true)}
+              className="w-full h-full object-cover"
+            />
           ) : (
-            <>
-              <Avatar name={post.authorName} avatarUrl={post.authorAvatarUrl} size={18} />
-              <p className="font-mono text-xs text-slate">{post.authorName}</p>
-            </>
+            <EyeIcon open={false} className="h-6 w-10 text-paper/25" />
           )}
         </div>
+        <div className="px-3 py-3">
+          <p className="font-display font-bold text-base leading-snug">{post.caption}</p>
+          <div className="flex items-center gap-1.5 mt-2">
+            {post.authorId ? (
+              <Link
+                href={`/u/${post.authorId}`}
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 hover:text-teal"
+              >
+                <Avatar name={post.authorName} avatarUrl={post.authorAvatarUrl} size={18} />
+                <p className="font-mono text-xs text-slate">{post.authorName}</p>
+              </Link>
+            ) : (
+              <>
+                <Avatar name={post.authorName} avatarUrl={post.authorAvatarUrl} size={18} />
+                <p className="font-mono text-xs text-slate">{post.authorName}</p>
+              </>
+            )}
+          </div>
+        </div>
       </div>
+
+      {expanded && (
+        <div className="px-3 pb-3">
+          <div className="flex items-center gap-2 pb-3 border-t border-evidence pt-3">
+            <SeenItButton postId={post.id} initiallySeen={false} />
+            <ShareButton postId={post.id} />
+            <ReportButton targetType="post" targetId={post.id} />
+          </div>
+          <div className="pb-3 border-t border-evidence pt-3">
+            <PostEventLauncher postId={post.id} />
+          </div>
+          <div className="border-t border-evidence pt-3">
+            <button
+              onClick={() => setCommentsOpen((open) => !open)}
+              className="font-mono text-xs uppercase tracking-wider text-teal hover:text-signal transition-colors"
+            >
+              {commentsOpen ? 'Hide comments' : `Comments${details ? ` (${details.commentCount})` : ''}`}
+            </button>
+            {commentsOpen && (
+              <div className="mt-3">
+                <CommentThread postId={post.id} />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
