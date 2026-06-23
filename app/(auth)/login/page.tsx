@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { signIn } from '../actions'
 
 export default function LoginPage() {
@@ -21,21 +22,46 @@ export default function LoginPage() {
       <p className="font-mono text-[11px] uppercase tracking-wider text-slate mb-1">Welcome back</p>
       <h1 className="font-display font-bold text-2xl mb-6">Log in</h1>
       <form action={handleSubmit} className="flex flex-col gap-4">
-        {error && <p role="alert" className="font-mono text-xs text-signal">{error}</p>}
+        {error && (
+          <p role="alert" className="font-mono text-xs text-signal">
+            {error}
+          </p>
+        )}
         <label className="block">
           <span className="block font-mono text-[11px] uppercase tracking-wider text-slate mb-1">Email</span>
-          <input name="email" type="email" required className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink" />
+          <input
+            name="email"
+            type="email"
+            required
+            className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink"
+          />
         </label>
         <label className="block">
           <span className="block font-mono text-[11px] uppercase tracking-wider text-slate mb-1">Password</span>
-          <input name="password" type="password" required className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink" />
+          <input
+            name="password"
+            type="password"
+            required
+            className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink"
+          />
         </label>
-        <button
-          type="submit"
-          className="font-mono text-xs uppercase tracking-wider px-4 py-2.5 bg-ink text-paper hover:bg-signal transition-colors"
-        >
-          Log in
-        </button>
+        <Link href="/forgot-password" className="self-end font-mono text-xs text-teal hover:text-signal underline">
+          Forgot password?
+        </Link>
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            className="flex-1 font-mono text-xs uppercase tracking-wider px-4 py-2.5 bg-teal text-paper hover:bg-signal active:bg-signal transition-colors"
+          >
+            Log in
+          </button>
+          <Link
+            href="/signup"
+            className="flex-1 flex items-center justify-center font-mono text-xs uppercase tracking-wider px-4 py-2.5 border border-teal text-teal hover:border-signal hover:text-signal transition-colors"
+          >
+            Sign up
+          </Link>
+        </div>
       </form>
     </div>
   )

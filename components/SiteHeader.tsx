@@ -14,6 +14,10 @@ export function SiteHeader({ displayName, avatarUrl }: { displayName: string | n
     return null
   }
 
+  // The login/signup pages have their own sign up/log in calls to action and
+  // a signed-out visitor can't post anyway, so the nav's Post link is noise here.
+  const hidePostLink = !displayName && (pathname === '/login' || pathname === '/signup')
+
   return (
     <header className="border-b border-evidence sticky top-0 z-10 bg-paper/95 backdrop-blur-sm">
       <div className="mx-auto max-w-2xl px-4 py-3 flex items-center justify-between">
@@ -42,9 +46,11 @@ export function SiteHeader({ displayName, avatarUrl }: { displayName: string | n
             </>
           ) : (
             <>
-              <Link href="/post/new" className="hover:text-teal transition-colors">
-                Post
-              </Link>
+              {!hidePostLink && (
+                <Link href="/post/new" className="hover:text-teal transition-colors">
+                  Post
+                </Link>
+              )}
               <Link href="/login" className="hover:text-teal transition-colors">
                 Log in
               </Link>

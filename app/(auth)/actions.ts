@@ -44,3 +44,19 @@ export async function signOut(): Promise<void> {
   const supabase = createServerSupabase()
   await supabase.auth.signOut()
 }
+
+export async function requestPasswordReset(formData: FormData): Promise<{ error?: string }> {
+  const email = formData.get('email') as string | null
+  if (!email) {
+    return { error: 'Email is required' }
+  }
+
+  const supabase = createServerSupabase()
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL ?? ''}/reset-password`,
+  })
+  if (error) {
+    return { error: error.message }
+  }
+  return {}
+}
