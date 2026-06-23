@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { EyeLogo } from '@/components/icons/Logo'
 import { Avatar } from '@/components/Avatar'
+import { PlusIcon } from '@/components/icons/SidebarIcons'
 import { signOut } from '@/app/(auth)/actions'
 
 export function SiteHeader({ displayName, avatarUrl }: { displayName: string | null; avatarUrl: string | null }) {
@@ -32,8 +33,8 @@ export function SiteHeader({ displayName, avatarUrl }: { displayName: string | n
                 <Avatar name={displayName} avatarUrl={avatarUrl} size={28} />
                 <strong className="font-semibold">{displayName}</strong>
               </Link>
-              <Link href="/post/new" className="hover:text-teal transition-colors">
-                Post
+              <Link href="/post/new" aria-label="New post" className="text-ink hover:text-teal transition-colors">
+                <PlusIcon className="h-5 w-5" />
               </Link>
               <form action={signOut}>
                 <button
@@ -47,8 +48,8 @@ export function SiteHeader({ displayName, avatarUrl }: { displayName: string | n
           ) : (
             <>
               {!hidePostLink && (
-                <Link href="/post/new" className="hover:text-teal transition-colors">
-                  Post
+                <Link href="/post/new" aria-label="New post" className="text-ink hover:text-teal transition-colors">
+                  <PlusIcon className="h-5 w-5" />
                 </Link>
               )}
               <Link href="/login" className="hover:text-teal transition-colors">

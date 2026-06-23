@@ -2,10 +2,12 @@
 'use client'
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useCurrentLocation } from '@/lib/location/use-current-location'
 import { reverseGeocode } from '@/lib/location/reverse-geocode'
 import { searchAddress, type AddressSuggestion } from '@/lib/location/search-address'
 import { createBrowserSupabase } from '@/lib/supabase/client'
+import { saveDraft } from '@/lib/drafts'
 
 const ADDRESS_SEARCH_DEBOUNCE_MS = 350
 
@@ -19,7 +21,16 @@ export default function NewPostPage() {
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([])
   const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [preview, setPreview] = useState<{ kind: 'image' | 'video'; url: string; name: string } | null>(null)
+  const [mediaFile, setMediaFile] = useState<File | Blob | null>(null)
+  const [recording, setRecording] = useState(false)
+  const [recordedVideoId, setRecordedVideoId] = useState<string | null>(null)
+  const [recordedUploadStatus, setRecordedUploadStatus] = useState<'idle' | 'uploading' | 'uploaded' | 'failed'>('idle')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const captionRef = useRef<HTMLTextAreaElement>(null)
+  const videoPreviewRef = useRef<HTMLVideoElement>(null)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const recordedChunksRef = useRef<Blob[]>([])
+  const streamRef = useRef<MediaStream | null>(null)
   const searchTimerRef = useRef<ReturnType<typeof setTimeout>>()
 
   function handleLocationInput(value: string) {
@@ -46,10 +57,76 @@ export default function NewPostPage() {
     const file = e.target.files?.[0]
     if (!file) {
       setPreview(null)
+      setMediaFile(null)
       return
     }
     const kind = file.type.startsWith('image/') ? 'image' : 'video'
     setPreview({ kind, url: URL.createObjectURL(file), name: file.name })
+    setMediaFile(file)
+    setRecordedVideoId(null)
+    setRecordedUploadStatus('idle')
+  }
+
+  async function startRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      streamRef.current = stream
+      if (videoPreviewRef.current) {
+        videoPreviewRef.current.srcObject = stream
+      }
+      recordedChunksRef.current = []
+      const recorder = new MediaRecorder(stream)
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunksRef.current.push(e.data)
+      }
+      recorder.onstop = () => {
+        const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' })
+        streamRef.current?.getTracks().forEach((track) => track.stop())
+        setPreview({ kind: 'video', url: URL.createObjectURL(blob), name: 'Recorded video' })
+        setMediaFile(blob)
+        uploadRecordedVideo(blob)
+      }
+      mediaRecorderRef.current = recorder
+      recorder.start()
+      setRecording(true)
+      setRecordedVideoId(null)
+      setRecordedUploadStatus('idle')
+      setError(undefined)
+    } catch {
+      setError('Could not access your camera or microphone')
+    }
+  }
+
+  function stopRecording() {
+    mediaRecorderRef.current?.stop()
+    setRecording(false)
+  }
+
+  async function uploadRecordedVideo(blob: Blob) {
+    setRecordedUploadStatus('uploading')
+    try {
+      const urlRes = await fetch('/api/videos/upload-url', { method: 'POST' })
+      if (!urlRes.ok) throw new Error('Could not start upload')
+      const { uploadUrl, videoId } = await urlRes.json()
+      const uploadForm = new FormData()
+      uploadForm.set('file', blob, 'recording.webm')
+      const uploadRes = await fetch(uploadUrl, { method: 'POST', body: uploadForm })
+      if (!uploadRes.ok) throw new Error('Video upload failed')
+      setRecordedVideoId(videoId)
+      setRecordedUploadStatus('uploaded')
+    } catch {
+      setRecordedUploadStatus('failed')
+      await saveDraft({
+        id: crypto.randomUUID(),
+        blob,
+        caption: captionRef.current?.value ?? '',
+        locationLabel,
+        lat: selectedCoords?.lat ?? location?.lat,
+        lng: selectedCoords?.lng ?? location?.lng,
+        createdAt: new Date().toISOString(),
+      })
+      setError('Could not upload your recording — saved to Drafts so you can retry later.')
+    }
   }
 
   async function shareMyLocation() {
@@ -75,18 +152,27 @@ export default function NewPostPage() {
   }
 
   async function handleSubmit(formData: FormData) {
+    if (!mediaFile) {
+      setError('Choose a photo or video, or record one')
+      return
+    }
+    if (recordedUploadStatus === 'uploading') {
+      setError('Still uploading your recording — wait a moment and try again')
+      return
+    }
     setUploading(true)
-    const file = formData.get('media') as File
     const caption = String(formData.get('caption') ?? '')
 
     try {
       let postBody: Record<string, unknown>
 
-      const isImage = file.type.startsWith('image/')
-      if (isImage) {
+      if (recordedVideoId && recordedUploadStatus === 'uploaded') {
+        postBody = { mediaType: 'video', videoId: recordedVideoId }
+      } else if (mediaFile.type.startsWith('image/')) {
         const supabase = createBrowserSupabase()
-        const path = `${crypto.randomUUID()}-${file.name}`
-        const { error: uploadError } = await supabase.storage.from('post-media').upload(path, file)
+        const name = mediaFile instanceof File ? mediaFile.name : 'photo.jpg'
+        const path = `${crypto.randomUUID()}-${name}`
+        const { error: uploadError } = await supabase.storage.from('post-media').upload(path, mediaFile)
         if (uploadError) throw new Error('Photo upload failed, please try again')
         const { data } = supabase.storage.from('post-media').getPublicUrl(path)
         postBody = { mediaType: 'image', imageUrl: data.publicUrl }
@@ -96,7 +182,7 @@ export default function NewPostPage() {
         const { uploadUrl, videoId } = await urlRes.json()
 
         const uploadForm = new FormData()
-        uploadForm.set('file', file)
+        uploadForm.set('file', mediaFile)
         const uploadRes = await fetch(uploadUrl, { method: 'POST', body: uploadForm })
         if (!uploadRes.ok) throw new Error('Video upload failed, please try again')
         postBody = { mediaType: 'video', videoId }
@@ -142,16 +228,33 @@ export default function NewPostPage() {
             name="media"
             type="file"
             accept="image/*,video/*"
-            required
             onChange={handleFileChange}
             className="sr-only"
           />
-          <label
-            htmlFor="media-input"
-            className="inline-block cursor-pointer font-mono text-xs uppercase tracking-wider bg-teal text-paper px-3 py-2 hover:bg-signal transition-colors"
-          >
-            Choose photo or video
-          </label>
+          <div className="flex flex-wrap gap-2">
+            <label
+              htmlFor="media-input"
+              className="inline-block cursor-pointer font-mono text-xs uppercase tracking-wider bg-teal text-paper px-3 py-2 hover:bg-signal transition-colors"
+            >
+              Choose photo or video
+            </label>
+            <button
+              type="button"
+              onClick={recording ? stopRecording : startRecording}
+              className="font-mono text-xs uppercase tracking-wider px-3 py-2 border border-teal text-teal hover:border-signal hover:text-signal transition-colors"
+            >
+              {recording ? 'Stop recording' : 'Record video'}
+            </button>
+          </div>
+          {recording && (
+            <video ref={videoPreviewRef} autoPlay muted playsInline className="w-full max-h-48 mt-3 bg-ink" />
+          )}
+          {recordedUploadStatus === 'uploading' && (
+            <p className="font-mono text-[11px] text-slate mt-2">Uploading your recording&hellip;</p>
+          )}
+          {recordedUploadStatus === 'uploaded' && (
+            <p className="font-mono text-[11px] text-teal mt-2">Recording uploaded.</p>
+          )}
           {preview && (
             <div className="mt-3 border border-evidence bg-white p-2">
               {preview.kind === 'image' ? (
@@ -165,7 +268,12 @@ export default function NewPostPage() {
         </div>
         <label className="block">
           <span className="block font-mono text-[11px] uppercase tracking-wider text-slate mb-1">Caption</span>
-          <textarea name="caption" rows={3} className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink" />
+          <textarea
+            ref={captionRef}
+            name="caption"
+            rows={3}
+            className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink"
+          />
         </label>
         <div className="relative">
           <span className="block font-mono text-[11px] uppercase tracking-wider text-slate mb-1">SeenIt at</span>
@@ -211,6 +319,12 @@ export default function NewPostPage() {
         >
           {uploading ? 'Uploading…' : 'Post'}
         </button>
+        <Link
+          href="/post/drafts"
+          className="text-center font-mono text-xs uppercase tracking-wider text-slate hover:text-teal transition-colors"
+        >
+          Drafts
+        </Link>
       </form>
     </div>
   )
