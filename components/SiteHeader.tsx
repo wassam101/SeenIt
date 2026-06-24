@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { EyeLogo } from '@/components/icons/Logo'
 import { Avatar } from '@/components/Avatar'
-import { PlusIcon } from '@/components/icons/SidebarIcons'
+import { MessagesFlyout } from '@/components/MessagesFlyout'
 import { signOut } from '@/app/(auth)/actions'
 
 export function SiteHeader({ displayName, avatarUrl }: { displayName: string | null; avatarUrl: string | null }) {
@@ -14,14 +14,6 @@ export function SiteHeader({ displayName, avatarUrl }: { displayName: string | n
   if (pathname === '/' && !displayName) {
     return null
   }
-
-  // The login/signup pages have their own sign up/log in calls to action and
-  // a signed-out visitor can't post anyway, so the nav's Post link is noise
-  // here. Same for forgot/reset password: someone who doesn't even have a
-  // working password yet shouldn't be offered a shortcut to post.
-  const hidePostLink =
-    !displayName &&
-    (pathname === '/login' || pathname === '/signup' || pathname === '/forgot-password' || pathname === '/reset-password')
 
   return (
     <header className="border-b border-evidence sticky top-0 z-10 bg-paper/95 backdrop-blur-sm">
@@ -37,9 +29,7 @@ export function SiteHeader({ displayName, avatarUrl }: { displayName: string | n
                 <Avatar name={displayName} avatarUrl={avatarUrl} size={28} />
                 <strong className="font-semibold">{displayName}</strong>
               </Link>
-              <Link href="/post/new" aria-label="New post" className="text-ink hover:text-teal transition-colors">
-                <PlusIcon className="h-5 w-5" />
-              </Link>
+              <MessagesFlyout />
               <form action={signOut}>
                 <button
                   type="submit"
@@ -51,11 +41,6 @@ export function SiteHeader({ displayName, avatarUrl }: { displayName: string | n
             </>
           ) : (
             <>
-              {!hidePostLink && (
-                <Link href="/post/new" aria-label="New post" className="text-ink hover:text-teal transition-colors">
-                  <PlusIcon className="h-5 w-5" />
-                </Link>
-              )}
               <Link href="/login" className="hover:text-teal transition-colors">
                 Log in
               </Link>

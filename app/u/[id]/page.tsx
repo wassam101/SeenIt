@@ -29,15 +29,26 @@ export default async function ProfilePage({ params }: { params: { id: string } }
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
-      <div className="flex items-center gap-4">
-        <Avatar name={profile.displayName} avatarUrl={profile.avatarUrl} size={64} />
+      <div className="flex items-center gap-5">
+        <Avatar name={profile.displayName} avatarUrl={profile.avatarUrl} size={88} />
         <div className="flex-1">
-          <h1 className="font-display font-bold text-2xl leading-snug">{profile.displayName}</h1>
-          <p className="font-mono text-xs text-slate mt-1">
+          <h1 className="font-display font-bold text-3xl leading-snug">{profile.displayName}</h1>
+          <p className="font-mono text-sm text-slate mt-1">
             {profile.followerCount} {profile.followerCount === 1 ? 'follower' : 'followers'} · {profile.followingCount} following
           </p>
         </div>
-        {!profile.isSelf && <FollowButton userId={profile.id} initiallyFollowing={profile.isFollowing} />}
+        {!profile.isSelf && (
+          <div className="flex items-center gap-2">
+            <FollowButton userId={profile.id} initiallyFollowing={profile.isFollowing} />
+            <span
+              aria-disabled="true"
+              title="Coming soon"
+              className="font-mono text-xs uppercase tracking-wider px-4 py-2 border border-evidence text-slate/50 cursor-default"
+            >
+              Message
+            </span>
+          </div>
+        )}
       </div>
 
       {profile.bio && <p className="text-sm text-ink/80 mt-4 max-w-md leading-snug">{profile.bio}</p>}

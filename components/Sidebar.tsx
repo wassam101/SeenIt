@@ -35,39 +35,46 @@ export function Sidebar({ userId }: { userId: string }) {
   ]
 
   return (
+    // The reserved width (w-56) never changes, so the feed next to it never
+    // shifts and the rail never has to overlap it either — hovering only
+    // fades the labels in within space that was already set aside for them.
     <nav
       aria-label="Main"
-      className="hidden md:flex md:flex-col md:gap-1 md:w-56 md:shrink-0 md:py-6 md:pr-4 md:border-r md:border-evidence"
+      className="group hidden md:block md:w-56 md:shrink-0 md:sticky md:top-[57px] md:self-start md:h-[calc(100vh-57px)] md:overflow-hidden md:py-6 md:pr-4 md:border-r md:border-evidence"
     >
-      {items.map(({ label, href, icon, comingSoon, active: explicitActive }) => {
-        const active = !comingSoon && (explicitActive ?? pathname === href.split('?')[0])
-        if (comingSoon) {
+      <div className="flex flex-col gap-1">
+        {items.map(({ label, href, icon, comingSoon, active: explicitActive }) => {
+          const active = !comingSoon && (explicitActive ?? pathname === href.split('?')[0])
+          if (comingSoon) {
+            return (
+              <span
+                key={label}
+                aria-disabled="true"
+                className="flex items-center gap-3 px-3 py-2.5 font-mono text-[13px] text-slate/50 cursor-default whitespace-nowrap"
+                title="Coming soon"
+              >
+                <NavIcon src={icon} className="h-7 w-7 shrink-0" />
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity">{label}</span>
+                <span className="ml-auto font-mono text-[9px] uppercase tracking-wider text-slate/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                  Soon
+                </span>
+              </span>
+            )
+          }
           return (
-            <span
+            <Link
               key={label}
-              aria-disabled="true"
-              className="flex items-center gap-3 px-3 py-2.5 font-mono text-[13px] text-slate/50 cursor-default"
-              title="Coming soon"
+              href={href}
+              className={`flex items-center gap-3 px-3 py-2.5 font-mono text-[13px] transition-colors whitespace-nowrap ${
+                active ? 'text-signal' : 'text-ink hover:text-teal'
+              }`}
             >
-              <NavIcon src={icon} className="h-7 w-7" />
-              {label}
-              <span className="ml-auto font-mono text-[9px] uppercase tracking-wider text-slate/40">Soon</span>
-            </span>
+              <NavIcon src={icon} className="h-7 w-7 shrink-0" />
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity">{label}</span>
+            </Link>
           )
-        }
-        return (
-          <Link
-            key={label}
-            href={href}
-            className={`flex items-center gap-3 px-3 py-2.5 font-mono text-[13px] transition-colors ${
-              active ? 'text-signal' : 'text-ink hover:text-teal'
-            }`}
-          >
-            <NavIcon src={icon} className="h-7 w-7" />
-            {label}
-          </Link>
-        )
-      })}
+        })}
+      </div>
     </nav>
   )
 }
