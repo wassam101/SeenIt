@@ -1,25 +1,27 @@
 'use client'
 import { useState } from 'react'
-import { ShareIcon } from '@/components/icons/Share'
+import { PaperPlaneIcon } from '@/components/icons/PaperPlane'
+import { ShareSheet } from '@/components/ShareSheet'
 
-export function ShareButton({ postId }: { postId: string }) {
-  const [shared, setShared] = useState(false)
-
-  async function share() {
-    const res = await fetch(`/api/posts/${postId}/reposts`, { method: 'POST' })
-    if (res.ok) setShared(true)
-  }
+export function ShareButton({ caption }: { postId: string; caption?: string | null }) {
+  const [open, setOpen] = useState(false)
 
   return (
-    <button
-      onClick={share}
-      disabled={shared}
-      className={`flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider px-3 py-1.5 transition-colors disabled:cursor-default ${
-        shared ? 'text-signal' : 'text-teal hover:text-signal'
-      }`}
-    >
-      <ShareIcon className="h-3.5 w-3.5" />
-      {shared ? 'Shared' : 'Share'}
-    </button>
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        aria-label="Share"
+        className="flex items-center rounded-full px-2 py-1 -mx-2 -my-1 text-slate hover:text-teal hover:bg-teal/10 transition-colors"
+      >
+        <PaperPlaneIcon className="h-[22px] w-[22px]" />
+      </button>
+      {open && (
+        <ShareSheet
+          url={typeof window !== 'undefined' ? window.location.href : ''}
+          caption={caption ?? ''}
+          onClose={() => setOpen(false)}
+        />
+      )}
+    </>
   )
 }

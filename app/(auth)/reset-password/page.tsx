@@ -67,12 +67,12 @@ export default function ResetPasswordPage() {
               type="password"
               required
               minLength={8}
-              className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink"
+              className="w-full border border-evidence bg-paper px-3 py-2 text-sm focus-visible:border-ink"
             />
           </label>
           <button
             type="submit"
-            className="font-mono text-xs uppercase tracking-wider px-4 py-2.5 bg-teal text-paper hover:bg-signal active:bg-signal transition-colors"
+            className="font-mono text-xs uppercase tracking-wider px-4 py-2.5 bg-teal text-white hover:bg-signal active:bg-signal transition-colors"
           >
             Save new password
           </button>

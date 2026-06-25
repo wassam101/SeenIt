@@ -47,7 +47,7 @@ export function ProfileTimeline({
 
   if (posts.length === 0) {
     return (
-      <p className="font-mono text-xs text-slate border border-dashed border-evidence px-3 py-6 text-center">
+      <p className="font-sans text-sm text-slate border border-dashed border-evidence px-3 py-6 text-center">
         No reports yet.
       </p>
     )
@@ -63,7 +63,7 @@ export function ProfileTimeline({
         ))}
       </ul>
       {nextCursor && <div ref={sentinelRef} className="h-1" aria-hidden="true" />}
-      {loadingMore && <p className="font-mono text-xs text-slate text-center py-4">Loading more&hellip;</p>}
+      {loadingMore && <p className="font-sans text-sm text-slate text-center py-4">Loading more&hellip;</p>}
     </>
   )
 }

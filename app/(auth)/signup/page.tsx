@@ -24,19 +24,19 @@ export default function SignupPage() {
         {error && <p role="alert" className="font-mono text-xs text-signal">{error}</p>}
         <label className="block">
           <span className="block font-mono text-[11px] uppercase tracking-wider text-slate mb-1">Display name</span>
-          <input name="displayName" required className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink" />
+          <input name="displayName" required className="w-full border border-evidence bg-paper px-3 py-2 text-sm focus-visible:border-ink" />
         </label>
         <label className="block">
           <span className="block font-mono text-[11px] uppercase tracking-wider text-slate mb-1">Email</span>
-          <input name="email" type="email" required className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink" />
+          <input name="email" type="email" required className="w-full border border-evidence bg-paper px-3 py-2 text-sm focus-visible:border-ink" />
         </label>
         <label className="block">
           <span className="block font-mono text-[11px] uppercase tracking-wider text-slate mb-1">Password</span>
-          <input name="password" type="password" required minLength={8} className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink" />
+          <input name="password" type="password" required minLength={8} className="w-full border border-evidence bg-paper px-3 py-2 text-sm focus-visible:border-ink" />
         </label>
         <button
           type="submit"
-          className="font-mono text-xs uppercase tracking-wider px-4 py-2.5 bg-ink text-paper hover:bg-signal transition-colors"
+          className="font-mono text-xs uppercase tracking-wider px-4 py-2.5 bg-ink text-white hover:bg-signal transition-colors"
         >
           Create account
         </button>

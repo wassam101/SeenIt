@@ -53,7 +53,7 @@ function OrbitTile({
     >
       <img src={post.thumbnailUrl} alt="" className="w-full aspect-square object-cover" />
       {post.caption && (
-        <p className="px-2 py-1.5 font-mono text-[11px] leading-snug text-paper line-clamp-2">{post.caption}</p>
+        <p className="px-2 py-1.5 font-sans text-xs leading-snug text-white line-clamp-2">{post.caption}</p>
       )}
     </div>
   )

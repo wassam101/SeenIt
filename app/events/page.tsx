@@ -41,7 +41,7 @@ export default async function EventsPage() {
             <li key={event.id}>
               <Link
                 href={`/events/${event.id}`}
-                className="block border border-evidence bg-white/40 hover:bg-white transition-colors px-4 py-3"
+                className="block border border-evidence bg-paper/40 hover:bg-paper transition-colors px-4 py-3"
               >
                 <p className="font-mono text-[11px] uppercase tracking-wider text-slate">
                   {event.type === 'action' ? 'Action' : 'Discussion'} · {formatRelativeTime(event.createdAt)}

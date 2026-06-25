@@ -34,7 +34,7 @@ export function MessagesFlyout() {
         <SendIcon className="h-5 w-5" />
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-2 z-20 w-72 bg-white border border-ink shadow-lg">
+        <div className="absolute right-0 top-full mt-2 z-20 w-72 bg-paper border border-ink shadow-lg">
           <div className="flex items-center justify-between px-4 py-3 border-b border-evidence">
             <p className="font-display font-bold text-sm">Messages</p>
             <button onClick={() => setOpen(false)} aria-label="Close" className="text-slate hover:text-ink transition-colors">
@@ -42,8 +42,8 @@ export function MessagesFlyout() {
             </button>
           </div>
           <div className="px-4 py-8 text-center">
-            <p className="font-mono text-xs text-slate">No messages yet.</p>
-            <p className="font-mono text-[11px] text-slate/60 mt-1">Direct messages are coming soon.</p>
+            <p className="font-sans text-sm text-slate">No messages yet.</p>
+            <p className="font-sans text-sm text-slate/60 mt-1">Direct messages are coming soon.</p>
           </div>
         </div>
       )}

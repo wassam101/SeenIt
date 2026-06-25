@@ -234,7 +234,7 @@ export default function NewPostPage() {
           <div className="flex flex-wrap gap-2">
             <label
               htmlFor="media-input"
-              className="inline-block cursor-pointer font-mono text-xs uppercase tracking-wider bg-teal text-paper px-3 py-2 hover:bg-signal transition-colors"
+              className="inline-block cursor-pointer font-mono text-xs uppercase tracking-wider bg-teal text-white px-3 py-2 hover:bg-signal transition-colors"
             >
               Choose photo or video
             </label>
@@ -247,7 +247,7 @@ export default function NewPostPage() {
             </button>
           </div>
           {recording && (
-            <video ref={videoPreviewRef} autoPlay muted playsInline className="w-full max-h-48 mt-3 bg-ink" />
+            <video ref={videoPreviewRef} autoPlay muted playsInline className="w-full max-h-48 mt-3 bg-black" />
           )}
           {recordedUploadStatus === 'uploading' && (
             <p className="font-mono text-[11px] text-slate mt-2">Uploading your recording&hellip;</p>
@@ -256,7 +256,7 @@ export default function NewPostPage() {
             <p className="font-mono text-[11px] text-teal mt-2">Recording uploaded.</p>
           )}
           {preview && (
-            <div className="mt-3 border border-evidence bg-white p-2">
+            <div className="mt-3 border border-evidence bg-paper p-2">
               {preview.kind === 'image' ? (
                 <img src={preview.url} alt="Selected preview" className="w-full max-h-48 object-cover" />
               ) : (
@@ -272,7 +272,7 @@ export default function NewPostPage() {
             ref={captionRef}
             name="caption"
             rows={3}
-            className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink"
+            className="w-full border border-evidence bg-paper px-3 py-2 text-sm focus-visible:border-ink"
           />
         </label>
         <div className="relative">
@@ -285,7 +285,7 @@ export default function NewPostPage() {
               placeholder="e.g. Starbucks, 6030 Main St W, Milton, ON"
               autoComplete="off"
               required
-              className="flex-1 border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink"
+              className="flex-1 border border-evidence bg-paper px-3 py-2 text-sm focus-visible:border-ink"
             />
             <button
               type="button"
@@ -297,7 +297,7 @@ export default function NewPostPage() {
             </button>
           </div>
           {suggestions.length > 0 && (
-            <ul className="absolute left-0 top-full mt-1 z-10 w-full bg-white border border-ink shadow-sm max-h-56 overflow-auto">
+            <ul className="absolute left-0 top-full mt-1 z-10 w-full bg-paper border border-ink shadow-sm max-h-56 overflow-auto">
               {suggestions.map((suggestion, i) => (
                 <li key={`${suggestion.label}-${i}`}>
                   <button
@@ -315,7 +315,7 @@ export default function NewPostPage() {
         <button
           type="submit"
           disabled={uploading}
-          className="font-mono text-xs uppercase tracking-wider px-4 py-2.5 bg-teal text-paper hover:bg-signal active:bg-signal transition-colors disabled:opacity-50 disabled:cursor-default"
+          className="font-mono text-xs uppercase tracking-wider px-4 py-2.5 bg-teal text-white hover:bg-signal active:bg-signal transition-colors disabled:opacity-50 disabled:cursor-default"
         >
           {uploading ? 'Uploading…' : 'Post'}
         </button>

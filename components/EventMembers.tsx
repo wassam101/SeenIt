@@ -35,14 +35,14 @@ export function EventMembers({ eventId }: { eventId: string }) {
 
   return (
     <section className="border-2 border-dashed border-caution bg-caution/10 px-4 py-4">
-      <p className="font-mono text-[11px] uppercase tracking-wider text-slate mb-3">
+      <p className="font-sans text-sm text-slate mb-3">
         {members.length} {members.length === 1 ? 'person' : 'people'} organizing
       </p>
       <button
         onClick={join}
         disabled={joined}
-        className={`font-mono text-xs uppercase tracking-wider px-4 py-2 transition-colors disabled:cursor-default ${
-          joined ? 'bg-ink text-paper' : 'bg-signal text-paper hover:bg-ink'
+        className={`font-sans text-sm font-semibold rounded-full px-4 py-2 transition-colors disabled:cursor-default ${
+          joined ? 'bg-black text-white' : 'bg-signal text-white hover:bg-black'
         }`}
       >
         {joined ? '✓ Joined' : 'Join event'}

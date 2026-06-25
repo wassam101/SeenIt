@@ -20,7 +20,7 @@ export function FollowButton({ userId, initiallyFollowing }: { userId: string; i
     <button
       onClick={toggle}
       disabled={pending}
-      className={`font-mono text-xs uppercase tracking-wider px-4 py-2 transition-colors disabled:opacity-50 ${
+      className={`font-sans text-sm font-semibold rounded-full px-4 py-2 transition-colors disabled:opacity-50 ${
         following ? 'text-signal' : 'text-teal hover:text-signal'
       }`}
     >

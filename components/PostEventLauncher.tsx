@@ -11,7 +11,7 @@ export function PostEventLauncher({ postId }: { postId: string }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="font-mono text-xs uppercase tracking-wider px-3 py-1.5 text-teal hover:text-signal active:text-signal transition-colors"
+        className="font-sans text-sm font-semibold rounded-full px-3 py-1.5 text-teal hover:text-signal active:text-signal transition-colors"
       >
         ⚠ Start event
       </button>

@@ -4,6 +4,7 @@ import { GET } from './route'
 
 vi.mock('@/lib/supabase/server', () => ({
   createServerSupabase: () => ({
+    auth: { getUser: async () => ({ data: { user: null } }) },
     from: () => ({
       select: () => ({
         eq: () => ({

@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
+import { HouseIcon } from '@/components/icons/House'
 
 type NavItem = {
   label: string
@@ -11,8 +12,25 @@ type NavItem = {
 }
 
 function NavIcon({ src, className }: { src: string; className?: string }) {
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} alt="" className={className} />
+  // Recolors the icon artwork via CSS mask (using its alpha shape only) so it
+  // can render solid white / signal-red against the dark theme instead of
+  // the original muddy teal-and-red two-tone, which had poor contrast on black.
+  return (
+    <span
+      aria-hidden="true"
+      className={className}
+      style={{
+        WebkitMaskImage: `url(${src})`,
+        maskImage: `url(${src})`,
+        WebkitMaskSize: 'contain',
+        maskSize: 'contain',
+        WebkitMaskRepeat: 'no-repeat',
+        maskRepeat: 'no-repeat',
+        WebkitMaskPosition: 'center',
+        maskPosition: 'center',
+      }}
+    />
+  )
 }
 
 export function Sidebar({ userId }: { userId: string }) {
@@ -28,7 +46,7 @@ export function Sidebar({ userId }: { userId: string }) {
     { label: 'Updates', href: '/updates', icon: '/sidebar-icons/Updates.png', comingSoon: true },
     { label: 'Events', href: '/events', icon: '/sidebar-icons/Events.png' },
     { label: 'Discussions', href: '/events', icon: '/sidebar-icons/Discussions.png' },
-    { label: 'Saved', href: '/saved', icon: '/sidebar-icons/Saved.png', comingSoon: true },
+    { label: 'Saved', href: '/saved', icon: '/sidebar-icons/Saved.png' },
     { label: 'Insights', href: '/insights', icon: '/sidebar-icons/Insights.png', comingSoon: true },
     { label: 'Profile', href: `/u/${userId}`, icon: '/sidebar-icons/Profile.png' },
     { label: 'Settings', href: '/account', icon: '/sidebar-icons/Settings.png' },
@@ -50,12 +68,12 @@ export function Sidebar({ userId }: { userId: string }) {
               <span
                 key={label}
                 aria-disabled="true"
-                className="flex items-center gap-3 px-3 py-2.5 font-mono text-[13px] text-slate/50 cursor-default whitespace-nowrap"
+                className="flex items-center gap-4 rounded-full px-3 py-3 font-sans text-xl text-slate/50 cursor-default whitespace-nowrap"
                 title="Coming soon"
               >
-                <NavIcon src={icon} className="h-7 w-7 shrink-0" />
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity">{label}</span>
-                <span className="ml-auto font-mono text-[9px] uppercase tracking-wider text-slate/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                <NavIcon src={icon} className="h-9 w-9 shrink-0 bg-white/30" />
+                <span>{label}</span>
+                <span className="ml-auto font-sans text-xs text-slate/40">
                   Soon
                 </span>
               </span>
@@ -65,12 +83,21 @@ export function Sidebar({ userId }: { userId: string }) {
             <Link
               key={label}
               href={href}
-              className={`flex items-center gap-3 px-3 py-2.5 font-mono text-[13px] transition-colors whitespace-nowrap ${
-                active ? 'text-signal' : 'text-ink hover:text-teal'
+              className={`group/nav flex items-center gap-4 rounded-full px-3 py-3 font-sans text-xl transition-colors whitespace-nowrap hover:bg-evidence/40 ${
+                active ? 'font-bold text-signal' : 'font-medium text-ink hover:text-teal'
               }`}
             >
-              <NavIcon src={icon} className="h-7 w-7 shrink-0" />
-              <span className="opacity-0 group-hover:opacity-100 transition-opacity">{label}</span>
+              {label === 'Home' ? (
+                <HouseIcon
+                  className={`h-9 w-9 shrink-0 transition-colors ${active ? 'text-signal' : 'text-white group-hover/nav:text-signal'}`}
+                />
+              ) : (
+                <NavIcon
+                  src={icon}
+                  className={`h-9 w-9 shrink-0 transition-colors ${active ? 'bg-signal' : 'bg-white group-hover/nav:bg-signal'}`}
+                />
+              )}
+              <span>{label}</span>
             </Link>
           )
         })}

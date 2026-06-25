@@ -79,12 +79,12 @@ export function FeedTabs() {
   return (
     <div>
       <nav className="flex flex-wrap items-center gap-3 mb-5">
-        <div className="flex gap-1 font-mono text-xs uppercase tracking-wider">
+        <div className="flex gap-1 font-sans text-sm font-semibold">
           <button
             onClick={() => setTab('global')}
             aria-pressed={tab === 'global'}
-            className={`px-3 py-1.5 transition-colors ${
-              tab === 'global' ? 'bg-teal text-paper' : 'text-slate hover:text-ink'
+            className={`rounded-full px-3 py-1.5 transition-colors ${
+              tab === 'global' ? 'bg-teal text-white' : 'text-slate hover:text-ink'
             }`}
           >
             Global
@@ -92,20 +92,20 @@ export function FeedTabs() {
           <button
             onClick={() => setTab('nearby')}
             aria-pressed={tab === 'nearby'}
-            className={`px-3 py-1.5 transition-colors ${
-              tab === 'nearby' ? 'bg-teal text-paper' : 'text-slate hover:text-ink'
+            className={`rounded-full px-3 py-1.5 transition-colors ${
+              tab === 'nearby' ? 'bg-teal text-white' : 'text-slate hover:text-ink'
             }`}
           >
             Nearby
           </button>
         </div>
         {tab === 'nearby' && (
-          <label className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-slate">
+          <label className="flex items-center gap-2 font-sans text-sm text-slate">
             Within
             <select
               value={radiusKm}
               onChange={(e) => setRadiusKm(Number(e.target.value))}
-              className="border border-evidence bg-white px-2 py-1.5 text-ink focus-visible:border-ink"
+              className="border border-evidence bg-paper px-2 py-1.5 text-ink focus-visible:border-ink"
             >
               {RADIUS_OPTIONS_KM.map((km) => (
                 <option key={km} value={km}>
@@ -117,12 +117,12 @@ export function FeedTabs() {
         )}
       </nav>
       {tab === 'nearby' && !location && (
-        <p className="font-mono text-xs text-slate border border-dashed border-evidence px-3 py-3 mb-4">
+        <p className="font-sans text-sm text-slate border border-dashed border-evidence px-3 py-3 mb-4">
           Allow location access, or set your location manually, to see nearby posts.
         </p>
       )}
       {posts.length === 0 ? (
-        <p className="font-mono text-xs text-slate border border-dashed border-evidence px-3 py-6 text-center">
+        <p className="font-sans text-sm text-slate border border-dashed border-evidence px-3 py-6 text-center">
           No reports yet. Be the first to post what you saw.
         </p>
       ) : (
@@ -136,7 +136,7 @@ export function FeedTabs() {
       )}
       {nextCursor && <div ref={sentinelRef} className="h-1" aria-hidden="true" />}
       {loadingMore && (
-        <p className="font-mono text-xs text-slate text-center py-4">Loading more&hellip;</p>
+        <p className="font-sans text-sm text-slate text-center py-4">Loading more&hellip;</p>
       )}
     </div>
   )

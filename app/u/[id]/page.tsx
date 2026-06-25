@@ -33,7 +33,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         <Avatar name={profile.displayName} avatarUrl={profile.avatarUrl} size={88} />
         <div className="flex-1">
           <h1 className="font-display font-bold text-3xl leading-snug">{profile.displayName}</h1>
-          <p className="font-mono text-sm text-slate mt-1">
+          <p className="font-sans text-sm text-slate mt-1">
             {profile.followerCount} {profile.followerCount === 1 ? 'follower' : 'followers'} · {profile.followingCount} following
           </p>
         </div>
@@ -43,7 +43,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
             <span
               aria-disabled="true"
               title="Coming soon"
-              className="font-mono text-xs uppercase tracking-wider px-4 py-2 border border-evidence text-slate/50 cursor-default"
+              className="font-sans text-sm font-semibold rounded-full px-4 py-2 border border-evidence text-slate/50 cursor-default"
             >
               Message
             </span>
@@ -54,7 +54,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
       {profile.bio && <p className="text-sm text-ink/80 mt-4 max-w-md leading-snug">{profile.bio}</p>}
 
       <div className="mt-8 border-t border-evidence pt-6">
-        <p className="font-mono text-[11px] uppercase tracking-wider text-slate mb-4">
+        <p className="font-sans text-sm text-slate mb-4">
           {profile.postsCount} {profile.postsCount === 1 ? 'report' : 'reports'}
         </p>
         <ProfileTimeline userId={profile.id} initialPosts={profile.posts} initialNextCursor={profile.nextPostsCursor} />

@@ -33,7 +33,7 @@ export default function LoginPage() {
             name="email"
             type="email"
             required
-            className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink"
+            className="w-full border border-evidence bg-paper px-3 py-2 text-sm focus-visible:border-ink"
           />
         </label>
         <label className="block">
@@ -42,7 +42,7 @@ export default function LoginPage() {
             name="password"
             type="password"
             required
-            className="w-full border border-evidence bg-white px-3 py-2 text-sm focus-visible:border-ink"
+            className="w-full border border-evidence bg-paper px-3 py-2 text-sm focus-visible:border-ink"
           />
         </label>
         <Link href="/forgot-password" className="self-end font-mono text-xs text-teal hover:text-signal underline">
@@ -51,7 +51,7 @@ export default function LoginPage() {
         <div className="flex gap-3">
           <button
             type="submit"
-            className="flex-1 font-mono text-xs uppercase tracking-wider px-4 py-2.5 bg-teal text-paper hover:bg-signal active:bg-signal transition-colors"
+            className="flex-1 font-mono text-xs uppercase tracking-wider px-4 py-2.5 bg-teal text-white hover:bg-signal active:bg-signal transition-colors"
           >
             Log in
           </button>

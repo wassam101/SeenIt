@@ -70,7 +70,7 @@ export default function DraftsPage() {
       ) : (
         <ul className="flex flex-col gap-4">
           {drafts.map((draft) => (
-            <li key={draft.id} className="border border-evidence bg-white p-3">
+            <li key={draft.id} className="border border-evidence bg-paper p-3">
               <video src={URL.createObjectURL(draft.blob)} controls className="w-full max-h-48 mb-2" />
               <p className="font-display font-bold text-sm leading-snug">{draft.caption || 'No caption'}</p>
               {draft.locationLabel && <p className="font-mono text-xs text-slate mt-1">{draft.locationLabel}</p>}
@@ -78,7 +78,7 @@ export default function DraftsPage() {
                 <button
                   onClick={() => retry(draft)}
                   disabled={retryingId === draft.id}
-                  className="font-mono text-xs uppercase tracking-wider px-3 py-1.5 bg-teal text-paper hover:bg-signal transition-colors disabled:opacity-50"
+                  className="font-mono text-xs uppercase tracking-wider px-3 py-1.5 bg-teal text-white hover:bg-signal transition-colors disabled:opacity-50"
                 >
                   {retryingId === draft.id ? 'Uploading…' : 'Retry upload'}
                 </button>

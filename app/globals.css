@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --color-paper: #ffffff;
-  --color-ink: #1c2421;
+  --color-paper: #000000;
+  --color-ink: #ffffff;
   --color-signal: #e4342e;
   --color-caution: #ebde99;
-  --color-slate: #6b7570;
-  --color-evidence: #e7e2c9;
+  --color-slate: #8b9590;
+  --color-evidence: rgba(255, 255, 255, 0.15);
   --color-teal: #3a867a;
 }
 

@@ -16,7 +16,7 @@ export function Avatar({ name, avatarUrl, size = 28 }: { name: string; avatarUrl
   return (
     <span
       aria-hidden="true"
-      className="rounded-full bg-teal text-paper font-mono font-semibold flex items-center justify-center shrink-0"
+      className="rounded-full bg-teal text-white font-sans font-semibold flex items-center justify-center shrink-0"
       style={{ width: size, height: size, fontSize: size * 0.45 }}
     >
       {initial}

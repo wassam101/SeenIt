@@ -2,8 +2,17 @@
 import { useState } from 'react'
 import { EyeIcon } from '@/components/icons/Eye'
 
-export function SeenItButton({ postId, initiallySeen }: { postId: string; initiallySeen: boolean }) {
+export function SeenItButton({
+  postId,
+  initiallySeen,
+  initialCount = 0,
+}: {
+  postId: string
+  initiallySeen: boolean
+  initialCount?: number
+}) {
   const [seen, setSeen] = useState(initiallySeen)
+  const [count, setCount] = useState(initialCount)
   const [justBlinked, setJustBlinked] = useState(false)
   const [showTooltip, setShowTooltip] = useState(false)
   const [likerNames, setLikerNames] = useState<string[] | null>(null)
@@ -14,6 +23,7 @@ export function SeenItButton({ postId, initiallySeen }: { postId: string; initia
     if (res.ok) {
       const json = await res.json()
       setSeen(json.liked)
+      setCount((c) => c + (json.liked ? 1 : -1))
       setJustBlinked(true)
       setTimeout(() => setJustBlinked(false), 400)
       setLikerNames(null)
@@ -35,17 +45,18 @@ export function SeenItButton({ postId, initiallySeen }: { postId: string; initia
       <button
         onClick={toggle}
         aria-pressed={seen}
-        className={`flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider px-3 py-1.5 transition-colors ${
-          seen ? 'text-signal' : 'text-teal hover:text-signal'
+        aria-label={seen ? 'Seen' : 'SeenIt'}
+        className={`flex items-center gap-1.5 font-sans text-sm transition-colors ${
+          seen ? 'text-signal' : 'text-slate hover:text-signal'
         }`}
       >
-        <EyeIcon open={seen} className={`h-3.5 w-6 ${justBlinked ? 'eye-blink-once' : ''}`} />
-        {seen ? 'Seen' : 'SeenIt'}
+        <EyeIcon open={seen} className={`h-5 w-9 ${justBlinked ? 'eye-blink-once' : ''}`} />
+        {count > 0 && <span>{count}</span>}
       </button>
       {showTooltip && (
         <div
           role="tooltip"
-          className="absolute left-0 bottom-full mb-1 z-10 whitespace-nowrap bg-ink text-paper font-mono text-[11px] px-2.5 py-1.5 shadow-sm"
+          className="absolute left-0 bottom-full mb-1 z-10 whitespace-nowrap bg-black text-white font-sans text-sm px-2.5 py-1.5 shadow-sm"
         >
           {likerNames === null ? '…' : likerNames.length === 0 ? 'No one yet' : likerNames.join(', ')}
         </div>

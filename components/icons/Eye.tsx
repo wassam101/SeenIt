@@ -16,7 +16,7 @@ export function EyeIcon({ open, className }: { open: boolean; className?: string
             strokeLinejoin="round"
           />
           <circle cx="16" cy="10" r="4.5" fill="currentColor" />
-          <circle cx="14.3" cy="8.3" r="1.3" fill="var(--color-paper)" />
+          <circle cx="14.3" cy="8.3" r="1.3" fill="#ffffff" />
         </>
       ) : (
         <>

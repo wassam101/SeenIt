@@ -18,7 +18,7 @@ export function WelcomeBanner() {
   if (!visible) return null
 
   return (
-    <div className="bg-teal text-paper">
+    <div className="bg-teal text-white">
       <div className="mx-auto max-w-2xl px-4 py-3 flex items-start gap-3">
         <EyeIcon open className="h-4 w-7 shrink-0 mt-0.5" />
         <p className="text-sm leading-snug">
@@ -28,7 +28,7 @@ export function WelcomeBanner() {
         <button
           onClick={() => setVisible(false)}
           aria-label="Dismiss"
-          className="ml-auto shrink-0 text-paper/80 hover:text-paper"
+          className="ml-auto shrink-0 text-white/80 hover:text-white"
         >
           ✕
         </button>

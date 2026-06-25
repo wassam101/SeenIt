@@ -34,7 +34,7 @@ export function CommentThread({ postId, eventId }: { postId?: string; eventId?: 
 
   return (
     <section>
-      <p className="font-mono text-[11px] uppercase tracking-wider text-slate mb-2">
+      <p className="font-sans text-sm text-slate mb-2">
         {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
       </p>
       <ul className="flex flex-col gap-2 mb-3">
@@ -60,11 +60,11 @@ export function CommentThread({ postId, eventId }: { postId?: string; eventId?: 
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Add a comment"
           required
-          className="flex-1 border border-evidence px-3 py-1.5 text-sm bg-white focus-visible:border-ink"
+          className="flex-1 border border-evidence px-3 py-1.5 text-sm bg-paper focus-visible:border-ink"
         />
         <button
           type="submit"
-          className="font-mono text-xs uppercase tracking-wider px-3 py-1.5 bg-teal text-paper hover:bg-signal active:bg-signal transition-colors"
+          className="font-sans text-sm font-semibold rounded-full px-3 py-1.5 bg-teal text-white hover:bg-signal active:bg-signal transition-colors"
         >
           Post
         </button>

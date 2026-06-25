@@ -70,4 +70,39 @@ describe('PostMenu', () => {
     fireEvent.click(screen.getByText('Go to post'))
     expect(onGoToPost).toHaveBeenCalledTimes(1)
   })
+
+  it('shows Edit and Delete instead of Report/Unfollow on your own post', () => {
+    render(<PostMenu postId="post-1" authorId="author-1" isOwnPost onGoToPost={() => {}} />)
+    fireEvent.click(screen.getByRole('button', { name: 'More options' }))
+    expect(screen.getByText('Edit')).toBeTruthy()
+    expect(screen.getByText('Delete')).toBeTruthy()
+    expect(screen.queryByText('Report')).toBeNull()
+    expect(screen.queryByText('Unfollow')).toBeNull()
+  })
+
+  it('edit calls onEdit and closes the menu', () => {
+    const onEdit = vi.fn()
+    render(<PostMenu postId="post-1" authorId="author-1" isOwnPost onGoToPost={() => {}} onEdit={onEdit} />)
+    fireEvent.click(screen.getByRole('button', { name: 'More options' }))
+    fireEvent.click(screen.getByText('Edit'))
+    expect(onEdit).toHaveBeenCalledTimes(1)
+  })
+
+  it('delete confirms, then calls onDelete', () => {
+    vi.stubGlobal('confirm', vi.fn(() => true))
+    const onDelete = vi.fn()
+    render(<PostMenu postId="post-1" authorId="author-1" isOwnPost onGoToPost={() => {}} onDelete={onDelete} />)
+    fireEvent.click(screen.getByRole('button', { name: 'More options' }))
+    fireEvent.click(screen.getByText('Delete'))
+    expect(onDelete).toHaveBeenCalledTimes(1)
+  })
+
+  it('delete does nothing if the confirm dialog is dismissed', () => {
+    vi.stubGlobal('confirm', vi.fn(() => false))
+    const onDelete = vi.fn()
+    render(<PostMenu postId="post-1" authorId="author-1" isOwnPost onGoToPost={() => {}} onDelete={onDelete} />)
+    fireEvent.click(screen.getByRole('button', { name: 'More options' }))
+    fireEvent.click(screen.getByText('Delete'))
+    expect(onDelete).not.toHaveBeenCalled()
+  })
 })
