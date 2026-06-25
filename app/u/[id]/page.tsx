@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { Avatar } from '@/components/Avatar'
 import { FollowButton } from '@/components/FollowButton'
@@ -40,13 +41,12 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         {!profile.isSelf && (
           <div className="flex items-center gap-2">
             <FollowButton userId={profile.id} initiallyFollowing={profile.isFollowing} />
-            <span
-              aria-disabled="true"
-              title="Coming soon"
-              className="font-sans text-sm font-semibold rounded-full px-4 py-2 border border-evidence text-slate/50 cursor-default"
+            <Link
+              href={`/messages/${profile.id}`}
+              className="font-sans text-sm font-semibold rounded-full px-4 py-2 border border-evidence text-ink hover:border-teal hover:text-teal transition-colors"
             >
               Message
-            </span>
+            </Link>
           </div>
         )}
       </div>

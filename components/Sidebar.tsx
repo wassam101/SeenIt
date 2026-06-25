@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { HouseIcon } from '@/components/icons/House'
+import { PaperPlaneIcon } from '@/components/icons/PaperPlane'
 
 type NavItem = {
   label: string
@@ -46,6 +47,7 @@ export function Sidebar({ userId }: { userId: string }) {
     { label: 'Updates', href: '/updates', icon: '/sidebar-icons/Updates.png', comingSoon: true },
     { label: 'Events', href: '/events', icon: '/sidebar-icons/Events.png' },
     { label: 'Discussions', href: '/events', icon: '/sidebar-icons/Discussions.png' },
+    { label: 'Messages', href: '/messages', icon: '/sidebar-icons/Saved.png' },
     { label: 'Saved', href: '/saved', icon: '/sidebar-icons/Saved.png' },
     { label: 'Insights', href: '/insights', icon: '/sidebar-icons/Insights.png', comingSoon: true },
     { label: 'Profile', href: `/u/${userId}`, icon: '/sidebar-icons/Profile.png' },
@@ -89,6 +91,10 @@ export function Sidebar({ userId }: { userId: string }) {
             >
               {label === 'Home' ? (
                 <HouseIcon
+                  className={`h-9 w-9 shrink-0 transition-colors ${active ? 'text-signal' : 'text-white group-hover/nav:text-signal'}`}
+                />
+              ) : label === 'Messages' ? (
+                <PaperPlaneIcon
                   className={`h-9 w-9 shrink-0 transition-colors ${active ? 'text-signal' : 'text-white group-hover/nav:text-signal'}`}
                 />
               ) : (
